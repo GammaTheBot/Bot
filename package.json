@@ -1,0 +1,34 @@
+{
+  "name": "gamma",
+  "version": "0.0.1",
+  "description": "The Gamma Discord Bot (and Website)",
+  "main": "index.ts",
+  "scripts": {
+    "start": "ts-node index.ts",
+    "dev": "nodemon index.ts"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/DeltaRays/Gamma.git"
+  },
+  "keywords": [
+    "Bot",
+    "Website",
+    "Delta",
+    "DeltaRays"
+  ],
+  "author": "DeltaRays, Migins",
+  "license": "GPL-3.0-or-later",
+  "bugs": {
+    "url": "https://github.com/DeltaRays/Gamma/issues"
+  },
+  "homepage": "https://github.com/DeltaRays/Gamma#readme",
+  "dependencies": {
+    "@types/node": "^14.11.1",
+    "discord.js": "^12.3.1",
+    "dotenv": "^8.2.0",
+    "nodemon": "^2.0.4",
+    "ts-node": "^9.0.0",
+    "typescript": "^4.0.2"
+  }
+}
