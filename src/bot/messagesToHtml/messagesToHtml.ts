@@ -94,7 +94,7 @@ export function messagesToHtml(
         const start = i;
         while (content[i] !== ">" && i < content.length && i < 2000) i++;
         if (content[i] === ">") {
-          const end = ++i;
+          const end = i + 1;
           const type = content.charAt(start + 1);
           let id = content.substring(start + 2, end - 1);
           if (type === "#") {
