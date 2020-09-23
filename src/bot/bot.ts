@@ -11,7 +11,9 @@ const bot = new Discord.Client({
     },
   },
 });
+
 bot.login(process.env.bot_token);
+
 bot.on("ready", () => {
   bot.user.setPresence({
     status: "online",
