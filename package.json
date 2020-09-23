@@ -8,10 +8,12 @@
   "license": "GPL-3",
   "private": true,
   "dependencies": {
+    "@types/jsdom": "^16.2.4",
     "@types/node": "^14.11.1",
     "@types/node-fetch": "^2.5.7",
     "discord.js": "^12.3.1",
     "dotenv": "^8.2.0",
+    "jsdom": "^16.4.0",
     "mongoose": "^5.10.6",
     "node-fetch": "^2.6.1",
     "ts-node": "^9.0.0",
@@ -19,6 +21,6 @@
   },
   "scripts": {
     "dev": "ts-node .",
-    "start": "tsc && node dist/index.js"
+    "start": "tsc -w && node dist/index.js"
   }
 }

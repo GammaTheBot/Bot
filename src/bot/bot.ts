@@ -21,3 +21,5 @@ bot.on("ready", () => {
     },
   });
 });
+
+export { bot };
