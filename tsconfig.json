@@ -9,5 +9,7 @@
     "outDir": "dist",
     "removeComments": true,
     "noImplicitAny": false
-  }
+  },
+  "include": ["src/**/*.ts"],
+  "exclude": ["node_modulex", ".vscode"]
 }
