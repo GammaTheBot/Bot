@@ -15,19 +15,25 @@ export const categories: {
 
 async function loadCommands(dir: string): Promise<any> {
   const files = await fs.readdir(dir);
-  for await (let file of files) {
+  fileloop: for await (let file of files) {
     // Cool ECMAScript feature
     if (file.endsWith(".ts")) {
       const cmds = await import(`${dir}/${file}`);
-      Object.values(cmds).forEach((v) => {
+      for (const v of Object.values(cmds)) {
         const cmd = <Command>v;
         if ("exec" in cmd) {
+          for (const arg of cmd.args) {
+            if (arg.unordered && arg.match === "everything") {
+              console.error("An arg can't be unordered and match everything!");
+              continue fileloop;
+            }
+          }
           commands.push(cmd);
           if (!categories[cmd.category].commands) {
             categories[cmd.category].commands = [cmd];
           }
         }
-      });
+      }
     } else if (!file.includes(".")) {
       await loadCommands(`${dir}/${file}`);
     }
@@ -58,7 +64,7 @@ export interface ArgPromptOptions {
 export interface Arg {
   type: ArgType;
   description: string;
-  match: "everything" | "others";
+  match?: "everything" | "others";
   optional?: boolean;
   unordered?: boolean | number;
   prompt?: ArgPromptOptions;

@@ -2,6 +2,7 @@ import { bot } from "../bot";
 import config from "../../config.json";
 import { Arg, ArgType, commands } from "../commandLoader";
 import Discord from "discord.js";
+import { messagesToHtml } from "../messagesToHtml/messagesToHtml";
 
 bot.on("message", async (message) => {
   const prefix = config.bot.prefix; //TODO Add per guild prefix
@@ -51,30 +52,95 @@ bot.on("message", async (message) => {
   }
 });
 
-function argParser(unparsedArgs: string[], args: Arg[]): any[] {
+console.log(
+  argParser(
+    ["big", "1000", "sad"],
+    [
+      { description: "e", type: ArgType.number, unordered: true },
+      { type: ArgType.string, description: "e" },
+    ]
+  )
+);
+
+function argParser(unparsedArgs: string[], argss: Arg[]): any[] {
+  let args = [...argss];
+  let usage = "";
   let result = [];
-  const workArgs = [...unparsedArgs];
+  let unorderedArgs: Arg[] = [];
   let i = 0;
-  let optionalArgs: Arg[] = [];
-  for (const arg of args) {
-    if (arg.match === "everything") {
-      result[i] = convertType(workArgs.join(" "), arg.type);
-      return result;
-    } else if (arg.unordered) {
-      const index = workArgs.findIndex((a) => convertType(a, arg.type) != null);
-      result[i] = convertType(workArgs[index], arg.type);
-      workArgs.splice(index, 1);
-    } else if (arg.optional) {
-      optionalArgs.push(arg);
+  for (const arg of argss) {
+    if (arg.unordered) {
+      unorderedArgs.push(arg);
+      args.splice(i, 1);
       continue;
+    } else if (arg.optional) {
+      if (arg.match === "everything") {
+        const casted = convertType(unparsedArgs.join(" "), arg.type);
+        if (casted != null) {
+          unparsedArgs.splice(0);
+          result.push(casted);
+          args.splice(i, 1);
+          i++;
+        }
+      } else {
+        const casted = convertType(unparsedArgs.shift(), arg.type);
+        if (casted != null) {
+          result.push(casted);
+          args.splice(i, 1);
+          i++;
+        }
+      }
+      continue;
+    } else if (arg.match === "everything") {
+      const casted = convertType(unparsedArgs.join(" "), arg.type);
+      if (casted != null) {
+        unparsedArgs.splice(0);
+        result.push(casted);
+        args.splice(i, 1);
+        i++;
+        continue;
+      }
     } else {
-      result[i] = convertType(workArgs.shift(), arg.type);
+      const casted = convertType(unparsedArgs.shift(), arg.type);
+      if (casted != null) {
+        result.push(casted);
+        args.splice(i, 1);
+        i++;
+        continue;
+      }
     }
-    i++;
+    const unordered = unorderedArgs.findIndex(
+      (a) => convertType(unparsedArgs[0], a.type) != null
+    );
+    if (unordered >= 0) {
+      result.push(convertType(unparsedArgs[0], unorderedArgs[unordered].type));
+      args.splice(i, 1);
+      i++;
+      unorderedArgs.splice(unordered, 1);
+    }
   }
-  optionalArgs.forEach((arg) => {
-    result[i] = convertType(workArgs.shift(), arg.type);
-  });
+  for (let unpArg of unparsedArgs) {
+    let i = -1;
+    for (const arg of unorderedArgs) {
+      if (arg.optional) {
+        const casted = convertType(unpArg, arg.type);
+        i++;
+        if (casted != null) {
+          result.push(casted);
+          unorderedArgs.splice(i, 1);
+          continue;
+        }
+      }
+      const casted = convertType(unparsedArgs.shift(), arg.type);
+      if (casted != null) {
+        result.push(casted);
+        unorderedArgs.splice(i, 1);
+        i++;
+        continue;
+      }
+    }
+  }
+  return result;
 }
 
 function convertType(arg: string, type: ArgType) {
@@ -87,7 +153,8 @@ function convertType(arg: string, type: ArgType) {
     case "uppercase":
       return arg.toUpperCase();
     case "number":
-      return Number(arg);
+      const n = Number(arg);
+      return isNaN(n) ? null : n;
     default:
       return arg;
   }
