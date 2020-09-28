@@ -1,6 +1,5 @@
 import { Language, Lang } from "../../../languages/Language";
 import { ArgType, Command } from "../../commandLoader";
-import { prefix } from "../../botConfig.json";
 import { MessageEmbed } from "discord.js";
 
 export const Eval: Command = {
