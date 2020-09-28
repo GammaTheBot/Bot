@@ -52,90 +52,55 @@ bot.on("message", async (message) => {
   }
 });
 
-console.log(
-  argParser(
-    ["big", "1000", "sad"],
-    [
-      { description: "e", type: ArgType.number, unordered: true },
-      { type: ArgType.string, description: "e" },
-    ]
-  )
-);
-
 function argParser(unparsedArgs: string[], argss: Arg[]): any[] {
   let args = [...argss];
   let usage = "";
   let result = [];
   let unorderedArgs: Arg[] = [];
-  let i = 0;
   for (const arg of argss) {
     if (arg.unordered) {
+      args.shift();
       unorderedArgs.push(arg);
-      args.splice(i, 1);
       continue;
-    } else if (arg.optional) {
-      if (arg.match === "everything") {
-        const casted = convertType(unparsedArgs.join(" "), arg.type);
-        if (casted != null) {
-          unparsedArgs.splice(0);
-          result.push(casted);
-          args.splice(i, 1);
-          i++;
-        }
-      } else {
-        const casted = convertType(unparsedArgs.shift(), arg.type);
-        if (casted != null) {
-          result.push(casted);
-          args.splice(i, 1);
-          i++;
-        }
-      }
-      continue;
-    } else if (arg.match === "everything") {
+    }
+    if (arg.match === "everything") {
       const casted = convertType(unparsedArgs.join(" "), arg.type);
       if (casted != null) {
-        unparsedArgs.splice(0);
+        args.shift();
         result.push(casted);
-        args.splice(i, 1);
-        i++;
-        continue;
+        break;
       }
     } else {
       const casted = convertType(unparsedArgs.shift(), arg.type);
       if (casted != null) {
+        args.shift();
         result.push(casted);
-        args.splice(i, 1);
-        i++;
-        continue;
       }
     }
+    if (arg.optional) continue;
     const unordered = unorderedArgs.findIndex(
       (a) => convertType(unparsedArgs[0], a.type) != null
     );
     if (unordered >= 0) {
       result.push(convertType(unparsedArgs[0], unorderedArgs[unordered].type));
-      args.splice(i, 1);
-      i++;
+      args.shift();
       unorderedArgs.splice(unordered, 1);
     }
   }
   for (let unpArg of unparsedArgs) {
-    let i = -1;
     for (const arg of unorderedArgs) {
       if (arg.optional) {
         const casted = convertType(unpArg, arg.type);
-        i++;
         if (casted != null) {
           result.push(casted);
-          unorderedArgs.splice(i, 1);
+          unorderedArgs.shift();
           continue;
         }
       }
       const casted = convertType(unparsedArgs.shift(), arg.type);
       if (casted != null) {
         result.push(casted);
-        unorderedArgs.splice(i, 1);
-        i++;
+        unorderedArgs.shift();
         continue;
       }
     }
