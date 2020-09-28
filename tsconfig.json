@@ -4,9 +4,10 @@
     "esModuleInterop": true,
     "downlevelIteration": true,
     "target": "ES5",
-    "sourceMap": true,
+    "sourceMap": false,
     "module": "CommonJS",
     "outDir": "dist",
+    "rootDir": "src",
     "removeComments": true,
     "noImplicitAny": false
   },

@@ -1,7 +1,7 @@
 import Discord from "discord.js";
 import { JSDOM } from "jsdom";
 import fs from "fs";
-import { numberComma } from "../../../functions";
+import { numberComma } from "../../functions";
 import { bot } from "../bot";
 try {
   var template = fs.readFileSync(`${__dirname}/template.html`).toString();

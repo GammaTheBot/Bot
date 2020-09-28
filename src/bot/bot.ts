@@ -25,6 +25,13 @@ bot.on("ready", async () => {
   });
   console.log("Loaded all events!");
   await import("./commandLoader");
+  updateStatus();
+  setInterval(updateStatus, 60000);
+});
+
+export { bot };
+
+async function updateStatus() {
   const serverCount = bot.guilds.cache.size;
   bot.user.setPresence({
     activity: {
@@ -33,6 +40,4 @@ bot.on("ready", async () => {
     },
     status: "online",
   });
-});
-
-export { bot };
+}

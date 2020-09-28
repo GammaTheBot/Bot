@@ -11,6 +11,7 @@
     "@types/jsdom": "^16.2.4",
     "@types/node": "^14.11.1",
     "@types/node-fetch": "^2.5.7",
+    "cross-env": "^7.0.2",
     "discord.js": "^12.3.1",
     "dotenv": "^8.2.0",
     "jsdom": "^16.4.0",
@@ -22,9 +23,10 @@
     "yaml": "^1.10.0"
   },
   "scripts": {
-    "start": "yarn run build && node dist/index.js",
-    "build": "tsc -w",
-    "dev": "ts-node .",
-    "dev:watch": "nodemon"
+    "start": "yarn run build && cross-env NODE_ENV=production node dist/index.js",
+    "build": "tsc",
+    "build:watch": "tsc -w",
+    "dev": "yarn run build && cross-env NODE_ENV=development node dist/index.js",
+    "dev:watch": "yarn run build:watch && cross-env NODE_ENV=development node dist/index.js"
   }
 }
