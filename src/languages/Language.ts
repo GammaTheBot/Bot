@@ -9,7 +9,6 @@ files.forEach((file) => {
   if (file.endsWith("yaml")) {
     const json = yaml.parse(fs.readFileSync(`${__dirname}/${file}`).toString());
     nodes[(file.replace(/\..*/gi, "") as unknown) as Lang] = json;
-    console.log(nodes);
   }
 });
 
@@ -19,7 +18,6 @@ export enum Lang {
 
 export const Language = {
   getNode: (language: Lang, node: string): string => {
-    console.log(language);
     const txt = nodes[language][node];
     if (txt) return txt;
     const english = nodes[Lang.English][node];

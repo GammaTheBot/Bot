@@ -1,8 +1,9 @@
 import { Language, Lang } from "../../../languages/Language";
 import { ArgType, Command } from "../../commandLoader";
-import { MessageEmbed } from "discord.js";
+const Discord = require("discord.js");
+const bot = require("../../bot").bot;
 
-export const Eval: Command = {
+export var Eval: Command = {
   category: "Utility",
   name: "eval",
   description: Language.getNode(Lang.English, "code.eval"),
@@ -11,7 +12,6 @@ export const Eval: Command = {
   ownerOnly: true,
   args: [
     {
-      index: 0,
       unordered: false,
       type: ArgType.string,
       match: "everything",
@@ -19,9 +19,9 @@ export const Eval: Command = {
     },
   ],
   dms: true,
-  exec: async (message, { args }: { args: string }) => {
+  exec: async (message, [text]: [string]) => {
     try {
-      const evaled = await eval(args);
+      const evaled = await eval(text);
       let content = `\`\`\`xl\n${evaled}\`\`\``;
       if (content.length > 1990) {
         console.log(evaled);
@@ -29,7 +29,7 @@ export const Eval: Command = {
           `:x: (SUCCESS) Content too long, pasting in console...`
         );
       }
-      const embed = new MessageEmbed()
+      const embed = new Discord.MessageEmbed()
         .setColor("GREEN")
         .setTimestamp()
         .setAuthor(message.author.tag, message.author.displayAvatarURL())
@@ -43,7 +43,7 @@ export const Eval: Command = {
           `:x: (ERROR) Content too long, pasting in console...`
         );
       }
-      const embed = new MessageEmbed()
+      const embed = new Discord.MessageEmbed()
         .setColor("RED")
         .setTimestamp()
         .setAuthor(message.author.tag, message.author.displayAvatarURL())

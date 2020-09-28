@@ -1,11 +1,47 @@
 import { Message, PermissionResolvable } from "discord.js";
-import fs from "fs";
+import fs from "fs/promises";
 
+export const commands: Command[] = [];
+
+import schema from "./commands/categories.json";
+
+export const categories: {
+  [key: string]: {
+    description: string;
+    name: string;
+    commands?: Command[];
+  };
+} = schema;
+
+async function loadCommands(dir: string): Promise<any> {
+  const files = await fs.readdir(dir);
+  for await (let file of files) {
+    // Cool ECMAScript feature
+    if (file.endsWith(".ts")) {
+      const cmds = await import(`${dir}/${file}`);
+      Object.values(cmds).forEach((v) => {
+        const cmd = <Command>v;
+        if ("exec" in cmd) {
+          commands.push(cmd);
+          if (!categories[cmd.category].commands) {
+            categories[cmd.category].commands = [cmd];
+          }
+        }
+      });
+    } else if (!file.includes(".")) {
+      await loadCommands(`${dir}/${file}`);
+    }
+  }
+}
+
+loadCommands(`${__dirname}/commands/`).then(() => {
+  console.log(`Loaded ${commands.length} command(s)!`);
+});
 export enum ArgType {
-  "uppercase",
-  "lowercase",
-  "string",
-  "number",
+  uppercase = "uppercase",
+  lowercase = "lowercase",
+  string = "string",
+  number = "number",
 }
 
 export interface ArgPromptOptions {
@@ -23,9 +59,9 @@ export interface Arg {
   type: ArgType;
   description: string;
   match: "everything" | "others";
+  optional?: boolean;
   unordered?: boolean | number;
   prompt?: ArgPromptOptions;
-  index: number;
 }
 
 export interface Command {
@@ -41,41 +77,3 @@ export interface Command {
   args?: Arg[];
   exec(message: Message, args: any): Promise<any> | any | void;
 }
-
-export const commands: Command[] = [];
-
-import schema from "./commands/categories.json";
-
-export const categories: {
-  [key: string]: {
-    description: string;
-    name: string;
-    commands?: Command[];
-  };
-} = schema;
-
-async function loadCommands(dir: string) {
-  const files = fs.readdirSync(dir);
-  files.forEach(async (file) => {
-    if (file.endsWith(".ts")) {
-      const cmds = await import(`${dir}/${file}`);
-      console.log(cmds);
-      Object.values(cmds).forEach((v) => {
-        const cmd = <Command>v;
-        if (cmd.name) {
-          commands.push(cmd);
-          if (!categories[cmd.category].commands) {
-            categories[cmd.category].commands = [cmd];
-          }
-        }
-      });
-    } else if (!file.includes(".")) {
-      loadCommands(`${dir}/${file}`);
-    }
-  });
-}
-
-loadCommands(`${__dirname}/commands/`).then(() => {
-  console.log(`Loaded the commands!`);
-});
-console.log(commands);
