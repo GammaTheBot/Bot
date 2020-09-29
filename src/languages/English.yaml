@@ -1,1 +1,3 @@
-code.eval: Evaluates code
+command:
+  eval:
+    description: Evaluates code

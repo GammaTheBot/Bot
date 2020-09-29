@@ -6,7 +6,7 @@ const bot = require("../../bot").bot;
 export var Eval: Command = {
   category: "Utility",
   name: "eval",
-  description: Language.getNode(Lang.English, "code.eval"),
+  description: Language.getNode(Lang.English, "command.eval.description"),
   aliases: ["evaluate"],
   clientPermissions: [],
   ownerOnly: true,

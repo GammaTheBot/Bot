@@ -9,10 +9,10 @@ bot.on("message", async (message) => {
   // All code after this is for the command
   let cmd: string;
   let unparsedArgs: string[];
-  if (message.mentions.users.firstKey() === bot.user.id) {
-    const messageArray = message.content.trim().split(" ");
+  if (message.content.startsWith(`<@${bot.user.id}>`)) {
+    const messageArray = message.content.split(" ");
     message.mentions.users.delete(bot.user.id);
-    messageArray[0] = messageArray[0].replace(/<@.*?>/i, "");
+    messageArray[0] = messageArray[0].replace(`<@${bot.user.id}>`, "");
     if (messageArray[0].length < 1) messageArray.shift();
     [cmd, unparsedArgs] = [messageArray.shift().toLowerCase(), messageArray];
   } else {
