@@ -3,3 +3,5 @@ command:
     description: Evaluates code
   help:
     description: Lists and describes the commands the bot contains
+  prefix:
+    description: Get the bot's prefix

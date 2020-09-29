@@ -1,5 +1,6 @@
 import { Message, PermissionResolvable } from "discord.js";
 import { promises as fs } from "fs";
+import { Type } from "yaml/util";
 
 export const commands: Command[] = [];
 
@@ -40,18 +41,20 @@ async function loadCommands(dir: string): Promise<any> {
 }
 
 function loadCommand(cmd: Command) {
-  for (const arg of cmd.args) {
-    if (arg.unordered && arg.match === "everything") {
-      console.error("An arg can't be unordered and match everything!");
-      return;
+  if (cmd.args)
+    for (const arg of cmd.args) {
+      if (arg.unordered && arg.match === "everything") {
+        console.error("An arg can't be unordered and match everything!");
+        return;
+      }
     }
-  }
   if (!cmd.usage) {
     const usage = [cmd.name];
-    for (const arg of cmd.args) {
-      const t = arg.name || arg.type;
-      usage.push(arg.optional ? `[${t}]` : `<${t}>`);
-    }
+    if (cmd.args)
+      for (const arg of cmd.args) {
+        const t = arg.name || arg.type;
+        usage.push(arg.optional ? `[${t}]` : `<${t}>`);
+      }
     cmd.usage = usage.join(" ");
   }
 
@@ -64,7 +67,7 @@ function loadCommand(cmd: Command) {
 loadCommands(`${__dirname}/commands/`).then(() => {
   console.log(`Loaded ${commands.length} command(s)!`);
 });
-export enum ArgType {
+export enum ArgType { //You can choose different arg type
   uppercase = "uppercase",
   lowercase = "lowercase",
   string = "string",
@@ -84,12 +87,11 @@ export interface ArgPromptOptions {
 
 export interface Arg {
   type: ArgType;
-  description(guild: string): string;
   match?: "everything" | "others";
   optional?: boolean;
   unordered?: boolean | number;
   prompt?: ArgPromptOptions;
-  name?: string;
+  name: string;
 }
 
 export interface Command {
@@ -98,6 +100,7 @@ export interface Command {
   description(guild?: string): string;
   aliases?: string[];
   dms?: boolean | true;
+  examples: string[];
   editable?: boolean | true;
   category: string;
   ownerOnly?: boolean;

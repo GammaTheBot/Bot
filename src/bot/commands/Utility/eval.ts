@@ -11,19 +11,19 @@ export var Eval: Command = {
   aliases: ["evaluate"],
   clientPermissions: [],
   ownerOnly: true,
-
+  examples: ["eval 1+1"],
   args: [
     {
       unordered: false,
       type: ArgType.string,
       match: "everything",
-      description: () => "The code to be evaluated",
+      name: "code",
     },
   ],
   dms: true,
-  exec: async (message, [text]: [string]) => {
+  exec: async (message, { code }: { code: string }) => {
     try {
-      const evaled = await eval(text);
+      const evaled = await eval(code);
       let content = `\`\`\`xl\n${evaled}\`\`\``;
       if (content.length > 1990) {
         console.log(evaled);
