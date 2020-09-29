@@ -25,7 +25,8 @@
   "scripts": {
     "start": "yarn run build && cross-env NODE_ENV=production node dist/index.js",
     "build": "tsc",
-    "dev": "yarn run build && cross-env NODE_ENV=development node dist/index.js",
-    "dev:watch": "cross-env NODE_ENV=development nodemon ."
+    "delta": "cross-env NODE_ENV=delta nodemon .",
+    "adxm": "cross-env NODE_ENV=adxm nodemon .",
+    "mig": "cross-env NODE_ENV=mig nodemon ."
   }
 }
