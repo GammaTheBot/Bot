@@ -52,16 +52,16 @@ export var Help: Command = {
       .setAuthor(message.author.tag, message.author.displayAvatarURL())
       .setDescription(
         `Name: \`${cmd.name}\`` +
-          `\n${cmd.usage ? `Usage: \`${prefix}${cmd.usage}\`` : ``}` +
-          `\n${
+          `${cmd.usage ? `\nUsage: \`${prefix}${cmd.usage}\`` : ``}` +
+          `${
             cmd.aliases
               ? `${
-                  cmd.aliases.length > 1 ? `Aliases: ` : `Alias:`
+                  cmd.aliases.length > 1 ? `\nAliases: ` : `\nAlias:`
                 } \`${cmd.aliases.join(", ")}\``
               : ``
           }` +
           `\nCategory: \`${cmd.category}\`` +
-          `\nDescription: \`${cmd.description(message.guild.id)}\`` +
+          `\n\nDescription: \`${cmd.description(message.guild.id)}\`` +
           `\n${
             cmd.examples.length > 1 ? `Examples: ` : `Example: `
           } ${cmd.examples.map((m) => `\`${m}\``).join(", ")}`
