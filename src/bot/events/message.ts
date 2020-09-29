@@ -7,6 +7,7 @@ import { Perms } from "../../Perms";
 import { Lang, Language } from "../../languages/Language";
 import { Utils } from "../../Utils";
 import stringSimilarity from "string-similarity";
+import { Guilds } from "../../Guilds";
 
 bot.on("message", async (message) => {
   // All code after this is for the command
@@ -121,19 +122,21 @@ async function handleCommand(message: Message) {
     }
     const missingArgs = [...args, ...unorderedArgs].filter((a) => !a.optional);
     if (missingArgs.length > 0) {
-      return message.channel.send(
-        Language.getNode(message.guild?.id, [
-          "command",
-          "missing-args",
-        ]).replace(
-          "{args}",
-          `${missingArgs.map((arg) =>
-            arg.optional
-              ? `[${arg.name || arg.type}]`
-              : `<${arg.name || arg.type}>`
-          )}`
-        )
-      );
+      const usage = [`${command.name}\``];
+      for (const arg of command.args) {
+        const t = arg.name || arg.type;
+        if (missingArgs.includes(arg)) {
+          usage.push(arg.optional ? `**\`[${t}]\`**` : `**\` <${t}>\`**`);
+        } else {
+          usage.push(arg.optional ? ` [${t}]` : ` <${t}>`);
+        }
+      }
+      const embed = new Discord.MessageEmbed()
+        .setColor(await Guilds.getColor(message.guild?.id))
+        .setTimestamp()
+        .setAuthor(message.author.tag, message.author.displayAvatarURL())
+        .setDescription(`Arguments missing!\n\`${prefix} ${usage.join("")}`);
+      return message.channel.send(embed);
     }
     command.exec(message, result);
   } else {

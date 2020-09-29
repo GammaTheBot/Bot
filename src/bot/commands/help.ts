@@ -62,7 +62,7 @@ export var Help: Command = {
               : ``
           }` +
           `\nCategory: \`${cmd.category}\`` +
-          `\n\nDescription: \`${cmd.description(message.guild.id)}\`` +
+          `\nDescription: \`${cmd.description(message.guild.id)}\`` +
           `\n${
             cmd.examples.length > 1 ? `Examples: ` : `Example: `
           } ${cmd.examples.map((m) => `\`${m}\``).join(", ")}`

@@ -18,7 +18,7 @@ export const Prefix: Command = {
     },
   ],
   description: (guild) =>
-    Language.getNode(guild, ["commands", "prefix", "description"]),
+    Language.getNode(guild, ["command", "prefix", "description"]),
   exec: async (message, { prefix }: { prefix: string }) => {
     if (prefix) {
       if (await Perms.hasPermission(message.member, "bot administrator")) {
