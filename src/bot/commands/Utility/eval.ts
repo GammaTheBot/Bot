@@ -6,16 +6,18 @@ const bot = require("../../bot").bot;
 export var Eval: Command = {
   category: "Utility",
   name: "eval",
-  description: Language.getNode(Lang.English, "command.eval.description"),
+  description: (guild) =>
+    Language.getNode(guild, ["command", "eval", "description"]),
   aliases: ["evaluate"],
   clientPermissions: [],
   ownerOnly: true,
+
   args: [
     {
       unordered: false,
       type: ArgType.string,
       match: "everything",
-      description: "The code to be evaluated",
+      description: () => "The code to be evaluated",
     },
   ],
   dms: true,
@@ -26,7 +28,7 @@ export var Eval: Command = {
       if (content.length > 1990) {
         console.log(evaled);
         return message.channel.send(
-          `:x: (SUCCESS) Content too long, pasting in console...`
+          `:: (SUCCESS) Content too long, pasting in console...`
         );
       }
       const embed = new Discord.MessageEmbed()

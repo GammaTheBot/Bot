@@ -2,11 +2,12 @@ import { bot } from "../bot";
 import config from "../../config.json";
 import { Arg, ArgType, commands } from "../commandLoader";
 import Discord from "discord.js";
-import { messagesToHtml } from "../messagesToHtml/messagesToHtml";
+import { GuildData } from "../../database/schemas";
 
 bot.on("message", async (message) => {
-  const prefix = config.bot.prefix; //TODO Add per guild prefix
   // All code after this is for the command
+  const guildData = await GuildData.findOne({ _id: message.guild.id }); //Looks for a document with the same id as the guild and if it finds it it uses that prefix
+  const prefix = guildData?.prefix || config.bot.prefix;
   let cmd: string;
   let unparsedArgs: string[];
   if (message.content.startsWith(`<@${bot.user.id}>`)) {
@@ -45,7 +46,6 @@ bot.on("message", async (message) => {
     if (command.userPermissions) {
     } // TODO Check for permissions
     //TODO Create command usage automatically and make it so if an argument is invalid it'll ask you to type a valid one again
-    //TODO
     //Argument parsing here we go!
     const argResult = argParser(unparsedArgs, command.args);
     command.exec(message, argResult);
@@ -54,7 +54,6 @@ bot.on("message", async (message) => {
 
 function argParser(unparsedArgs: string[], argss: Arg[]): any[] {
   let args = [...argss];
-  let usage = "";
   let result = [];
   let unorderedArgs: Arg[] = [];
   for (const arg of argss) {
