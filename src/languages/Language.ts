@@ -17,11 +17,20 @@ export enum Lang {
 }
 
 export const Language = {
-  getNode: (language: Lang, node: string): string => {
-    const txt = nodes[language][node];
+  getNode: (guild: string, subnodes: string[]): string => {
+    let language = Lang.English;
+    let txt: any = nodes[language];
+    subnodes.forEach((node) => {
+      txt = txt[node];
+    });
     if (txt) return txt;
-    const english = nodes[Lang.English][node];
-    if (english) return english;
-    return `❗ Invalid language node (${node}, ${language})! Please report this to the Gamma discord server (https://discord.gg/XNDAw7Y)`;
+    txt = nodes[Lang.English];
+    subnodes.forEach((node) => {
+      txt = txt[node];
+    });
+    if (txt) return txt;
+    return `❗ Invalid language node (${subnodes.join(
+      "."
+    )}, ${language})! Please report this to the Gamma discord server (https://discord.gg/XNDAw7Y)`;
   },
 };

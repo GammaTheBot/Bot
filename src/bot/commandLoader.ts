@@ -22,6 +22,8 @@ async function loadCommands(dir: string): Promise<any> {
       for (const v of Object.values(cmds)) {
         const cmd = <Command>v;
         if ("exec" in cmd) {
+          if (cmd.name === "help") {
+          }
           for (const arg of cmd.args) {
             if (arg.unordered && arg.match === "everything") {
               console.error("An arg can't be unordered and match everything!");
@@ -63,7 +65,7 @@ export interface ArgPromptOptions {
 
 export interface Arg {
   type: ArgType;
-  description: string;
+  description(guild: string): string;
   match?: "everything" | "others";
   optional?: boolean;
   unordered?: boolean | number;
@@ -72,7 +74,7 @@ export interface Arg {
 
 export interface Command {
   name: string;
-  description: string;
+  description(guild?: string): string;
   aliases?: string[];
   dms?: boolean | true;
   editable?: boolean | true;

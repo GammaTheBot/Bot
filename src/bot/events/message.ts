@@ -2,7 +2,6 @@ import { bot } from "../bot";
 import config from "../../config.json";
 import { Arg, ArgType, commands } from "../commandLoader";
 import Discord from "discord.js";
-import { messagesToHtml } from "../messagesToHtml/messagesToHtml";
 
 bot.on("message", async (message) => {
   const prefix = config.bot.prefix; //TODO Add per guild prefix
