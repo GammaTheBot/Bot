@@ -1,4 +1,4 @@
-import { GuildData } from "./database/schemas";
+import { GuildData } from "./database/schemas/guilds";
 import { bot } from "./config.json";
 
 export class Guilds {

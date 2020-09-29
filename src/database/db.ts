@@ -1,5 +1,4 @@
-import mongoose, { Connection, Mongoose } from "mongoose";
-import { GuildData } from "./schemas";
+import mongoose from "mongoose";
 mongoose.connect(
   `mongodb+srv://Gamma:${process.env.mongo_password}@gamma.gkggs.mongodb.net/Gamma?retryWrites=true&w=majority`,
   {
@@ -16,4 +15,3 @@ db.on("error", console.error.bind(console, "Connection error: "));
 db.once("open", () => {
   console.log("Connected to the database!");
 });
-import("./schemas");

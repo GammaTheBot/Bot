@@ -1,4 +1,4 @@
-import { GuildData } from "../../../database/schemas";
+import { GuildData } from "../../../database/schemas/guilds";
 import { Language } from "../../../languages/Language";
 import { ArgType, Command } from "../../commandLoader";
 import { bot } from "../../../config.json";

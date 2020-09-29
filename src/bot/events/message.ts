@@ -2,7 +2,7 @@ import { bot } from "../bot";
 import config from "../../config.json";
 import { Arg, ArgType, commands, commandsRunEdit } from "../commandLoader";
 import Discord, { Message } from "discord.js";
-import { GuildData } from "../../database/schemas";
+import { GuildData } from "../../database/schemas/guilds";
 import { Perms } from "../../Perms";
 import { Lang, Language } from "../../languages/Language";
 import { Utils } from "../../Utils";
