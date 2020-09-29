@@ -27,6 +27,9 @@
     "build": "tsc",
     "delta": "cross-env NODE_ENV=delta nodemon .",
     "adxm": "cross-env NODE_ENV=adxm nodemon .",
-    "mig": "cross-env NODE_ENV=mig nodemon ."
+    "mig": "cross-env NODE_ENV=mig nodemon .",
+    "delta:watch": "cross-env NODE_ENV=delta ts-node .",
+    "adxm:watch": "cross-env NODE_ENV=adxm ts-node .",
+    "mig:watch": "cross-env NODE_ENV=mig ts-node ."
   }
 }
