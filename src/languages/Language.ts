@@ -19,12 +19,15 @@ export enum Lang {
 export const Language = {
   getNode: (guild: string, subnodes: string[]): string => {
     let language = Lang.English;
-    let txt: any = nodes[language];
-    subnodes.forEach((node) => {
-      txt = txt[node];
-    });
-    if (txt) return txt;
-    txt = nodes[Lang.English];
+    if (guild) {
+      let txt: any = nodes[language];
+
+      subnodes.forEach((node) => {
+        txt = txt[node];
+      });
+      if (txt) return txt;
+    }
+    let txt: any = nodes[Lang.English];
     subnodes.forEach((node) => {
       txt = txt[node];
     });

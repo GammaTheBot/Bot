@@ -2,6 +2,7 @@ import Discord from "discord.js";
 import fs from "fs";
 import path from "path";
 import { numberComma } from "../functions";
+import { Utils } from "../Utils";
 const bot = new Discord.Client({
   // Creates a discordjs client
   messageCacheMaxSize: 100, // How many messages per channel should be cached
@@ -37,9 +38,11 @@ async function updateStatus() {
   const serverCount = bot.guilds.cache.size;
   bot.user.setPresence({
     activity: {
-      name: `on ${numberComma(serverCount)} server${
-        serverCount === 1 ? "" : "s"
-      }!`,
+      name: `on ${numberComma(serverCount)} ${Utils.getPlural(
+        serverCount,
+        "server",
+        "servers"
+      )}!`,
       type: "PLAYING",
     },
     status: "online",

@@ -52,9 +52,9 @@ bot.on("message", async (message) => {
   }
 });
 
-function argParser(unparsedArgs: string[], argss: Arg[]): any[] {
+function argParser(unparsedArgs: string[], argss: Arg[]): {} {
   let args = [...argss];
-  let result = [];
+  let result = {};
   let unorderedArgs: Arg[] = [];
   for (const arg of argss) {
     if (arg.unordered) {
@@ -66,14 +66,14 @@ function argParser(unparsedArgs: string[], argss: Arg[]): any[] {
       const casted = convertType(unparsedArgs.join(" "), arg.type);
       if (casted != null) {
         args.shift();
-        result.push(casted);
+        result[arg.name] = casted;
         break;
       }
     } else {
       const casted = convertType(unparsedArgs.shift(), arg.type);
       if (casted != null) {
         args.shift();
-        result.push(casted);
+        result[arg.name] = casted;
       }
     }
     if (arg.optional) continue;
@@ -81,7 +81,10 @@ function argParser(unparsedArgs: string[], argss: Arg[]): any[] {
       (a) => convertType(unparsedArgs[0], a.type) != null
     );
     if (unordered >= 0) {
-      result.push(convertType(unparsedArgs[0], unorderedArgs[unordered].type));
+      result[arg.name] = convertType(
+        unparsedArgs[0],
+        unorderedArgs[unordered].type
+      );
       args.shift();
       unorderedArgs.splice(unordered, 1);
     }
@@ -91,24 +94,26 @@ function argParser(unparsedArgs: string[], argss: Arg[]): any[] {
       if (arg.optional) {
         const casted = convertType(unpArg, arg.type);
         if (casted != null) {
-          result.push(casted);
+          result[arg.name] = casted;
           unorderedArgs.shift();
           continue;
         }
       }
       const casted = convertType(unparsedArgs.shift(), arg.type);
       if (casted != null) {
-        result.push(casted);
+        result[arg.name] = casted;
         unorderedArgs.shift();
         continue;
       }
     }
   }
+  console.log(unorderedArgs, args);
+  console.log(result);
   return result;
 }
 
 function convertType(arg: string, type: ArgType) {
-  if (arg.length < 1) return null;
+  if (arg?.length < 1) return null;
   switch (type) {
     case "string":
       return arg;

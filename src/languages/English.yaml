@@ -1,3 +1,5 @@
 command:
   eval:
     description: Evaluates code
+  prefix:
+    description: Get the bot's prefix
