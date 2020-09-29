@@ -1,8 +1,11 @@
 import { Message, PermissionResolvable } from "discord.js";
 import { promises as fs } from "fs";
 import { Type } from "yaml/util";
+import { BotPermissions } from "../Perms";
 
 export const commands: Command[] = [];
+
+export const commandsRunEdit: Command[] = [];
 
 import schema from "./commands/categories.json";
 
@@ -16,27 +19,19 @@ export const categories: {
 
 async function loadCommands(dir: string): Promise<any> {
   const files = await fs.readdir(dir);
-  let helpCmd: Command;
-  fileloop: for await (let file of files) {
+  for await (let file of files) {
     // Cool ECMAScript feature
     if (file.endsWith(".ts")) {
       const cmds = await import(`${dir}/${file}`);
       for (const v of Object.values(cmds)) {
         const cmd = <Command>v;
         if ("exec" in cmd) {
-          if (cmd.name === "help") {
-            helpCmd = cmd;
-            continue;
-          }
           loadCommand(cmd);
         }
       }
     } else if (!file.includes(".")) {
       await loadCommands(`${dir}/${file}`);
     }
-  }
-  if (helpCmd != null) {
-    loadCommand(helpCmd);
   }
 }
 
@@ -57,11 +52,11 @@ function loadCommand(cmd: Command) {
       }
     cmd.usage = usage.join(" ");
   }
-
   commands.push(cmd);
+  if (cmd.editable) commandsRunEdit.push(cmd);
   if (!categories[cmd.category].commands) {
     categories[cmd.category].commands = [cmd];
-  }
+  } else categories[cmd.category].commands.push(cmd);
 }
 
 loadCommands(`${__dirname}/commands/`).then(() => {
@@ -103,9 +98,10 @@ export interface Command {
   examples: string[];
   editable?: boolean | true;
   category: string;
-  ownerOnly?: boolean;
+  botOwnerOnly?: boolean;
+  guildOwnerOnly?: boolean;
   clientPermissions: PermissionResolvable | PermissionResolvable[];
-  userPermissions?: PermissionResolvable | PermissionResolvable[];
+  userPermissions?: BotPermissions | BotPermissions[];
   args?: Arg[];
   exec(message: Message, args: any): Promise<any> | any | void;
 }

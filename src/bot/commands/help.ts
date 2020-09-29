@@ -1,12 +1,13 @@
-import { Language, Lang } from "../../../languages/Language";
-import { ArgType, Command, commands, categories } from "../../commandLoader";
+import { Language, Lang } from "../../languages/Language";
+import { ArgType, Command, commands, categories } from "../commandLoader";
 import Discord from "discord.js";
-import { Guilds } from "../../../Guilds";
+import { Guilds } from "../../Guilds";
 
 export var Help: Command = {
   category: "Utility",
   name: "help",
   usage: "help [command]",
+  editable: true,
   description: (guild) =>
     Language.getNode(guild, ["command", "help", "description"]),
   clientPermissions: [],
@@ -22,7 +23,7 @@ export var Help: Command = {
   dms: true,
   examples: ["help", "help eval"],
   exec: async (message, { command }: { command: string }) => {
-      const prefix: string = await Guilds.getPrefix(message.guild.id);
+    const prefix: string = await Guilds.getPrefix(message.guild.id);
     if (!command) {
       const helpEmbed = new Discord.MessageEmbed()
         .setColor("BLUE")

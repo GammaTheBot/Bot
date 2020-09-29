@@ -1,11 +1,22 @@
 import { bot } from "../bot";
 import config from "../../config.json";
-import { Arg, ArgType, commands } from "../commandLoader";
-import Discord from "discord.js";
+import { Arg, ArgType, commands, commandsRunEdit } from "../commandLoader";
+import Discord, { Message } from "discord.js";
 import { GuildData } from "../../database/schemas";
+import { Perms } from "../../Perms";
+import { Lang, Language } from "../../languages/Language";
+import { Utils } from "../../Utils";
+import stringSimilarity from "string-similarity";
 
 bot.on("message", async (message) => {
   // All code after this is for the command
+  //TODO Make it so if an argument is invalid it'll ask you to type a valid one again
+  //Argument parsing here we go!
+  handleCommand(message);
+});
+
+async function handleCommand(message: Message) {
+  if (message.author.bot) return;
   const guildData = await GuildData.findOne({ _id: message.guild.id }); //Looks for a document with the same id as the guild and if it finds it it uses that prefix
   const prefix = guildData?.prefix || config.bot.prefix;
   let cmd: string;
@@ -32,66 +43,74 @@ bot.on("message", async (message) => {
       return message.channel.send(
         ":x: This command can't be used in direct messages!"
       );
-    if (command.ownerOnly && !(await isBotOwner(message.member.id)))
+    if (command.guildOwnerOnly && message.guild.ownerID !== message.member.id) {
       return message.channel.send(
-        ":no_entry: Only the owners of the bot can run this command!"
+        Perms.noPermEmoji() +
+          Language.getNode(message.guild.id, ["noperms", "guildOwner"])
+      );
+    }
+    if (command.botOwnerOnly && !(await Utils.isBotOwner(message.member.id)))
+      return message.channel.send(
+        Perms.noPermEmoji() +
+          Language.getNode(message.guild.id, ["noperms", "botOwner"])
       );
     if (
       message.guild.me
         .permissionsIn(message.channel)
         .missing(new Discord.Permissions(command.clientPermissions)).length > 0
     ) {
-      return message.channel.send(":x: ");
-    }
-    if (command.userPermissions) {
-    } // TODO Check for permissions
-    //TODO Create command usage automatically and make it so if an argument is invalid it'll ask you to type a valid one again
-    //Argument parsing here we go!
-    const argResult = argParser(unparsedArgs, command.args);
-    command.exec(message, argResult);
-  }
-});
-
-function argParser(unparsedArgs: string[], argss: Arg[]): {} {
-  let args = [...argss];
-  let result = {};
-  let unorderedArgs: Arg[] = [];
-  for (const arg of argss) {
-    if (arg.unordered) {
-      args.shift();
-      unorderedArgs.push(arg);
-      continue;
-    }
-    if (arg.match === "everything") {
-      const casted = convertType(unparsedArgs.join(" "), arg.type);
-      if (casted != null) {
-        args.shift();
-        result[arg.name] = casted;
-        break;
-      }
-    } else {
-      const casted = convertType(unparsedArgs.shift(), arg.type);
-      if (casted != null) {
-        args.shift();
-        result[arg.name] = casted;
-      }
-    }
-    if (arg.optional) continue;
-    const unordered = unorderedArgs.findIndex(
-      (a) => convertType(unparsedArgs[0], a.type) != null
-    );
-    if (unordered >= 0) {
-      result[arg.name] = convertType(
-        unparsedArgs[0],
-        unorderedArgs[unordered].type
+      return message.channel.send(
+        Perms.noPermEmoji() +
+          Language.getNode(message.guild.id, ["noperms", "bot"])
       );
-      args.shift();
-      unorderedArgs.splice(unordered, 1);
     }
-  }
-  for (let unpArg of unparsedArgs) {
-    for (const arg of unorderedArgs) {
-      if (arg.optional) {
+    if (
+      command.userPermissions &&
+      !(await Perms.hasPermission(message.member, command.userPermissions))
+    ) {
+      return message.channel.send(
+        Perms.noPermEmoji() +
+          Language.getNode(message.guild.id, ["noperms", "general"])
+      );
+    }
+    let args = [...command.args];
+    let result = {};
+    let unorderedArgs: Arg[] = [];
+    for (const arg of command.args) {
+      if (arg.unordered) {
+        args.shift();
+        unorderedArgs.push(arg);
+        continue;
+      }
+      if (arg.match === "everything") {
+        const casted = convertType(unparsedArgs.join(" "), arg.type);
+        if (casted != null) {
+          args.shift();
+          result[arg.name] = casted;
+          break;
+        }
+      } else {
+        const casted = convertType(unparsedArgs.shift(), arg.type);
+        if (casted != null) {
+          args.shift();
+          result[arg.name] = casted;
+          continue;
+        }
+      }
+      const unordered = unorderedArgs.findIndex(
+        (a) => convertType(unparsedArgs[0], a.type) != null
+      );
+      if (unordered >= 0) {
+        result[arg.name] = convertType(
+          unparsedArgs[0],
+          unorderedArgs[unordered].type
+        );
+        args.shift();
+        unorderedArgs.splice(unordered, 1);
+      }
+    }
+    for (let unpArg of unparsedArgs) {
+      for (const arg of unorderedArgs) {
         const casted = convertType(unpArg, arg.type);
         if (casted != null) {
           result[arg.name] = casted;
@@ -99,17 +118,37 @@ function argParser(unparsedArgs: string[], argss: Arg[]): {} {
           continue;
         }
       }
-      const casted = convertType(unparsedArgs.shift(), arg.type);
-      if (casted != null) {
-        result[arg.name] = casted;
-        unorderedArgs.shift();
-        continue;
-      }
     }
+    const missingArgs = [...args, ...unorderedArgs].filter((a) => !a.optional);
+    if (missingArgs.length > 0) {
+      return message.channel.send(
+        Language.getNode(message.guild?.id, [
+          "command",
+          "missing-args",
+        ]).replace(
+          "{args}",
+          `${missingArgs.map((arg) =>
+            arg.optional
+              ? `[${arg.name || arg.type}]`
+              : `<${arg.name || arg.type}>`
+          )}`
+        )
+      );
+    }
+    command.exec(message, result);
+  } else {
+    const bestMatch = stringSimilarity.findBestMatch(
+      cmd,
+      commands.map((c) => c.name)
+    );
+    const str = bestMatch.bestMatch.target;
+    return message.channel.send(
+      Language.getNode(message.guild?.id, ["command", "unknown"]).replace(
+        "{cmd}",
+        `\`${str}\``
+      )
+    );
   }
-  console.log(unorderedArgs, args);
-  console.log(result);
-  return result;
 }
 
 function convertType(arg: string, type: ArgType) {
@@ -129,9 +168,9 @@ function convertType(arg: string, type: ArgType) {
   }
 }
 
-async function isBotOwner(id: string): Promise<boolean> {
-  const app = await bot.fetchApplication();
-  const owner = app.owner;
-  if (owner instanceof Discord.User) return id === owner.id;
-  return (<Discord.Team>owner).members.map((m) => m.id).includes(id);
-}
+bot.on("messageUpdate", async (oldMessage, newMessage) => {
+  if (commandsRunEdit.length > 0) {
+    newMessage = await newMessage.fetch();
+    handleCommand(newMessage);
+  }
+});

@@ -1,12 +1,12 @@
 import { GuildMember } from "discord.js";
 
 export class Perms {
-  static noPermissionMessage(type: string): string {
-    return `🔒 You don't have permission to ${type}!`;
+  static noPermEmoji(): string {
+    return `⛔`;
   }
   static async hasPermission(
     member: GuildMember,
-    perm: BotPermissions
+    perm: BotPermissions | BotPermissions[]
   ): Promise<boolean> {
     if (member.hasPermission("ADMINISTRATOR")) return true;
     /*

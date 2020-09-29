@@ -5,3 +5,12 @@ command:
     description: Lists and describes the commands the bot contains
   prefix:
     description: Get the bot's prefix
+  unknown: Command not found! Maybe you meant {cmd}
+  missing-args: Command {arg} {args} missing!
+  arg: argument
+  args: arguments
+noperms:
+  botowner: Only the bot owners can do this!
+  guildowner: Only the guild owner can do this!
+  general: You don't have enough permissions to do this!
+  bot: The bot doesn't have enough permissions to do this!
