@@ -15,6 +15,7 @@ export const categories: {
 
 async function loadCommands(dir: string): Promise<any> {
   const files = await fs.readdir(dir);
+  let helpCmd: Command;
   fileloop: for await (let file of files) {
     // Cool ECMAScript feature
     if (file.endsWith(".ts")) {
@@ -23,22 +24,40 @@ async function loadCommands(dir: string): Promise<any> {
         const cmd = <Command>v;
         if ("exec" in cmd) {
           if (cmd.name === "help") {
+            helpCmd = cmd;
+            continue;
           }
-          for (const arg of cmd.args) {
-            if (arg.unordered && arg.match === "everything") {
-              console.error("An arg can't be unordered and match everything!");
-              continue fileloop;
-            }
-          }
-          commands.push(cmd);
-          if (!categories[cmd.category].commands) {
-            categories[cmd.category].commands = [cmd];
-          }
+          loadCommand(cmd);
         }
       }
     } else if (!file.includes(".")) {
       await loadCommands(`${dir}/${file}`);
     }
+  }
+  if (helpCmd != null) {
+    loadCommand(helpCmd);
+  }
+}
+
+function loadCommand(cmd: Command) {
+  for (const arg of cmd.args) {
+    if (arg.unordered && arg.match === "everything") {
+      console.error("An arg can't be unordered and match everything!");
+      return;
+    }
+  }
+  if (!cmd.usage) {
+    const usage = [cmd.name];
+    for (const arg of cmd.args) {
+      const t = arg.name || arg.type;
+      usage.push(arg.optional ? `[${t}]` : `<${t}>`);
+    }
+    cmd.usage = usage.join(" ");
+  }
+
+  commands.push(cmd);
+  if (!categories[cmd.category].commands) {
+    categories[cmd.category].commands = [cmd];
   }
 }
 
@@ -70,10 +89,12 @@ export interface Arg {
   optional?: boolean;
   unordered?: boolean | number;
   prompt?: ArgPromptOptions;
+  name?: string;
 }
 
 export interface Command {
   name: string;
+  usage?: string;
   description(guild?: string): string;
   aliases?: string[];
   dms?: boolean | true;
