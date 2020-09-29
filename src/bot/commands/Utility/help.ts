@@ -1,7 +1,7 @@
 import { Language, Lang } from "../../../languages/Language";
 import { ArgType, Command, commands, categories } from "../../commandLoader";
 import Discord from "discord.js";
-// import { bot } from "../../bot";
+import { Guilds } from "../../../Guilds";
 
 export var Help: Command = {
   category: "Utility",
@@ -22,13 +22,14 @@ export var Help: Command = {
   dms: true,
   examples: ["help", "help eval"],
   exec: async (message, { command }: { command: string }) => {
+      const prefix: string = await Guilds.getPrefix(message.guild.id);
     if (!command) {
       const helpEmbed = new Discord.MessageEmbed()
         .setColor("BLUE")
         .setTitle("Gamma Help")
         .setTimestamp()
         .setDescription(
-          "Execute `!help <command>` to find information on specific commands!"
+          `The prefix of this bot is \`${prefix}\` and the user tag of the bot. For example \`@Gamma help\` or \`${prefix}help\`. Execute \`!help <command>\` to find information on specific commands!`
         )
         .setAuthor(message.author.tag, message.author.displayAvatarURL());
       for (const key of Object.values(categories)) {
@@ -51,7 +52,7 @@ export var Help: Command = {
       .setAuthor(message.author.tag, message.author.displayAvatarURL())
       .setDescription(
         `Name: \`${cmd.name}\`` +
-          `\n${cmd.usage ? `Usage: \`${cmd.usage}\`` : ``}` +
+          `\n${cmd.usage ? `Usage: \`${prefix}${cmd.usage}\`` : ``}` +
           `\n${
             cmd.aliases
               ? `${
