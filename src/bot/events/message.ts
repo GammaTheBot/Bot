@@ -135,7 +135,7 @@ async function handleCommand(message: Message) {
         .setColor(await Guilds.getColor(message.guild?.id))
         .setTimestamp()
         .setAuthor(message.author.tag, message.author.displayAvatarURL())
-        .setDescription(`Arguments missing!\n\`${prefix} ${usage.join("")}`);
+        .setDescription(`Arguments missing!\n\`${prefix}${usage.join("")}`);
       return message.channel.send(embed);
     }
     command.exec(message, result);
