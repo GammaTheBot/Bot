@@ -9,7 +9,7 @@ interface Exp extends mongoose.Document {
 }
 
 export const ExpData: mongoose.Model<Exp> = mongoose.model(
-  "Exp",
+  "expData",
   new mongoose.Schema({
     _id: String,
     multiplier: Number,

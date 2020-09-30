@@ -31,7 +31,7 @@ interface Tickets extends mongoose.Document {
 }
 
 export const TicketData: mongoose.Model<Tickets> = mongoose.model(
-  "Tickets",
+  "ticketData",
   new mongoose.Schema({
     _id: String,
     sections: {

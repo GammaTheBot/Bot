@@ -39,7 +39,7 @@ interface Moderation extends mongoose.Document {
 }
 
 export const ModerationData: mongoose.Model<Moderation> = mongoose.model(
-  "Moderation",
+  "moderationData",
   new mongoose.Schema({
     _id: String,
     punishments: [

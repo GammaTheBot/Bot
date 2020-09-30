@@ -17,7 +17,7 @@ interface CustomCommand extends mongoose.Document {
 }
 
 export const CustomCommandData: mongoose.Model<CustomCommand> = mongoose.model(
-  "CustomCommand",
+  "customCommandData",
   new mongoose.Schema({
     _id: String,
     commands: {

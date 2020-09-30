@@ -18,7 +18,7 @@ interface Member extends mongoose.Document {
 }
 
 export const MemberData: mongoose.Model<Member> = mongoose.model(
-  "Guild",
+  "memberData",
   new mongoose.Schema({
     _id: String,
     members: {

@@ -24,7 +24,7 @@ interface Channel extends mongoose.Document {
 }
 
 export const ChannelData: mongoose.Model<Channel> = mongoose.model(
-  "Channel",
+  "channelData",
   new mongoose.Schema(
     {
       _id: String,

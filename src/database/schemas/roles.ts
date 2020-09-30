@@ -21,7 +21,7 @@ interface Role extends mongoose.Document {
 }
 
 export const RoleData: mongoose.Model<Role> = mongoose.model(
-  "Role",
+  "roleData",
   new mongoose.Schema({
     _id: String,
     react: {

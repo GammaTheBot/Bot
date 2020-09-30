@@ -74,69 +74,74 @@ async function handleCommand(message: Message) {
           Language.getNode(message.guild.id, ["noperms", "general"])
       );
     }
-    let args = [...command.args];
     let result = {};
-    let unorderedArgs: Arg[] = [];
-    for (const arg of command.args) {
-      if (arg.unordered) {
-        args.shift();
-        unorderedArgs.push(arg);
-        continue;
-      }
-      if (arg.match === "everything") {
-        const casted = convertType(unparsedArgs.join(" "), arg.type);
-        if (casted != null) {
-          args.shift();
-          result[arg.name] = casted;
-          break;
-        }
-      } else {
-        const casted = convertType(unparsedArgs.shift(), arg.type);
-        if (casted != null) {
-          args.shift();
-          result[arg.name] = casted;
-          continue;
-        }
-      }
-      const unordered = unorderedArgs.findIndex(
-        (a) => convertType(unparsedArgs[0], a.type) != null
-      );
-      if (unordered >= 0) {
-        result[arg.name] = convertType(
-          unparsedArgs[0],
-          unorderedArgs[unordered].type
-        );
-        args.shift();
-        unorderedArgs.splice(unordered, 1);
-      }
-    }
-    for (let unpArg of unparsedArgs) {
-      for (const arg of unorderedArgs) {
-        const casted = convertType(unpArg, arg.type);
-        if (casted != null) {
-          result[arg.name] = casted;
-          unorderedArgs.shift();
-          continue;
-        }
-      }
-    }
-    const missingArgs = [...args, ...unorderedArgs].filter((a) => !a.optional);
-    if (missingArgs.length > 0) {
-      const usage = [`${command.name}\``];
+    if (command.args) {
+      let args = [...command.args];
+
+      let unorderedArgs: Arg[] = [];
       for (const arg of command.args) {
-        const t = arg.name || arg.type;
-        if (missingArgs.includes(arg)) {
-          usage.push(arg.optional ? `**\`[${t}]\`**` : `**\` <${t}>\`**`);
+        if (arg.unordered) {
+          args.shift();
+          unorderedArgs.push(arg);
+          continue;
+        }
+        if (arg.match === "everything") {
+          const casted = convertType(unparsedArgs.join(" "), arg.type);
+          if (casted != null) {
+            args.shift();
+            result[arg.name] = casted;
+            break;
+          }
         } else {
-          usage.push(arg.optional ? ` [${t}]` : ` <${t}>`);
+          const casted = convertType(unparsedArgs.shift(), arg.type);
+          if (casted != null) {
+            args.shift();
+            result[arg.name] = casted;
+            continue;
+          }
+        }
+        const unordered = unorderedArgs.findIndex(
+          (a) => convertType(unparsedArgs[0], a.type) != null
+        );
+        if (unordered >= 0) {
+          result[arg.name] = convertType(
+            unparsedArgs[0],
+            unorderedArgs[unordered].type
+          );
+          args.shift();
+          unorderedArgs.splice(unordered, 1);
         }
       }
-      const embed = new Discord.MessageEmbed()
-        .setColor(await Guilds.getColor(message.guild?.id))
-        .setTimestamp()
-        .setAuthor(message.author.tag, message.author.displayAvatarURL())
-        .setDescription(`Arguments missing!\n\`${prefix} ${usage.join("")}`);
-      return message.channel.send(embed);
+      for (let unpArg of unparsedArgs) {
+        for (const arg of unorderedArgs) {
+          const casted = convertType(unpArg, arg.type);
+          if (casted != null) {
+            result[arg.name] = casted;
+            unorderedArgs.shift();
+            continue;
+          }
+        }
+      }
+      const missingArgs = [...args, ...unorderedArgs].filter(
+        (a) => !a.optional
+      );
+      if (missingArgs.length > 0) {
+        const usage = [`${command.name}\``];
+        for (const arg of command.args) {
+          const t = arg.name || arg.type;
+          if (missingArgs.includes(arg)) {
+            usage.push(arg.optional ? `**\`[${t}]\`**` : `**\` <${t}>\`**`);
+          } else {
+            usage.push(arg.optional ? ` [${t}]` : ` <${t}>`);
+          }
+        }
+        const embed = new Discord.MessageEmbed()
+          .setColor(await Guilds.getColor(message.guild?.id))
+          .setTimestamp()
+          .setAuthor(message.author.tag, message.author.displayAvatarURL())
+          .setDescription(`Arguments missing!\n\`${prefix} ${usage.join("")}`);
+        return message.channel.send(embed);
+      }
     }
     command.exec(message, result);
   } else {

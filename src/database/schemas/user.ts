@@ -23,7 +23,7 @@ interface User extends mongoose.Document {
 }
 
 export const UserData: mongoose.Model<User> = mongoose.model(
-  "User",
+  "userData",
   new mongoose.Schema({
     _id: String,
     users: {

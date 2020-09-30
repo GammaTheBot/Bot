@@ -19,7 +19,7 @@ interface Guild extends mongoose.Document {
 }
 
 export const GuildData: mongoose.Model<Guild> = mongoose.model(
-  "Guild",
+  "guildData",
   new mongoose.Schema({
     _id: String,
     prefix: String,

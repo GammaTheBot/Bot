@@ -14,8 +14,8 @@ interface Guild extends mongoose.Document {
   bypassChannels: string[];
 }
 
-export const GuildData: mongoose.Model<Guild> = mongoose.model(
-  "Logging",
+export const LoggingData: mongoose.Model<Guild> = mongoose.model(
+  "loggingData",
   new mongoose.Schema({
     _id: String,
     emojis: String,
