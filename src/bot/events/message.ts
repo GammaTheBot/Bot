@@ -126,7 +126,7 @@ async function handleCommand(message: Message) {
       for (const arg of command.args) {
         const t = arg.name || arg.type;
         if (missingArgs.includes(arg)) {
-          usage.push(arg.optional ? `**\`[${t}]\`**` : `**\` <${t}>\`**`);
+          usage.push(`**\` <${t}>\`**`);
         } else {
           usage.push(arg.optional ? ` [${t}]` : ` <${t}>`);
         }
