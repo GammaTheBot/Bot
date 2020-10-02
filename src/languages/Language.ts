@@ -1,5 +1,7 @@
 import yaml from "yaml";
 import fs from "fs";
+import { Utils } from "../Utils";
+import { GuildData } from "../database/schemas/guilds";
 
 const files = fs.readdirSync(__dirname);
 
@@ -17,13 +19,21 @@ export enum Lang {
 }
 
 export const Language = {
-  getNode: (guild: string, subnodes: string[]): string => {
-    let language = Lang.English;
-    if (guild) {
+  getNode: async (
+    guildId: string,
+    subnodess: string[] | string
+  ): Promise<string> => {
+    let language =
+      (await Utils.getDoc(guildId, "guildData", 1000))?.language ||
+      Lang.English;
+    let subnodes: string[] = [];
+    if (typeof subnodess === "string") subnodes = subnodess.split(".");
+    else subnodes = subnodess;
+    subnodess = <string[]>subnodess;
+    if (guildId) {
       let txt: any = nodes[language];
-
       subnodes.forEach((node) => {
-        txt = txt[node];
+        txt = txt?.[node];
       });
       if (txt) return txt;
     }
@@ -35,5 +45,19 @@ export const Language = {
     return `❗ Invalid language node (${subnodes.join(
       "."
     )}, ${language})! Please report this to the Gamma discord server (https://discord.gg/XNDAw7Y)`;
+  },
+  replaceNodes: async (guildId: string, text: string): Promise<string> => {
+    for (let i = 0; i < text.length; i++) {
+      if (text.charAt(i) === "{") {
+        const start = i;
+        while (text.charAt(i) !== "}") i++;
+        const placeholder = text.substring(start + 1, i);
+        text = text.replace(
+          `{${placeholder}}`,
+          await Language.getNode(guildId, placeholder.split("."))
+        );
+      }
+    }
+    return text;
   },
 };

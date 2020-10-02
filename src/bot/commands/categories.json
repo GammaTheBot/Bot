@@ -1,6 +1,10 @@
 {
   "Utility": {
-    "name": "⚒️ Utility",
-    "description": "Useful commands"
+    "name": "⚒️ {categories.Utility.name}",
+    "description": "{categories.Utility.description}"
+  },
+  "Games": {
+    "name": "🎮 {categories.Games.name}",
+    "description": "{categories.Games.description}"
   }
 }

@@ -5,11 +5,11 @@ import { bot } from "../../../config.json";
 import { Guilds } from "../../../Guilds";
 import { Perms } from "../../../Perms";
 export const Prefix: Command = {
-  name: "prefix",
+  name: "command.prefix.name",
   category: "Utility",
   clientPermissions: ["SEND_MESSAGES"],
   dms: true,
-  examples: ["prefix"],
+  examples: "command.prefix.examples",
   args: [
     {
       type: ArgType.string,
@@ -17,8 +17,7 @@ export const Prefix: Command = {
       name: "prefix",
     },
   ],
-  description: (guild) =>
-    Language.getNode(guild, ["command", "prefix", "description"]),
+  description: "command.prefix.description",
   exec: async (message, { prefix }: { prefix: string }) => {
     if (prefix) {
       if (await Perms.hasPermission(message.member, "bot administrator")) {

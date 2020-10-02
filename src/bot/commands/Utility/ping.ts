@@ -3,12 +3,12 @@ import { bot } from "../../bot";
 import { Command } from "../../commandLoader";
 
 export const Ping: Command = {
-  name: "ping",
-  aliases: ["pong"],
-  description: (guild) => "Get the bot's description",
+  name: "command.ping.name",
+  aliases: "command.ping.aliases",
+  description: "command.ping.description",
   category: "Utility",
   clientPermissions: ["SEND_MESSAGES"],
-  examples: ["ping"],
+  examples: "command.ping.examples",
   dms: true,
   editable: true,
   exec: async (message) => {

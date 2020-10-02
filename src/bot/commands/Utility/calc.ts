@@ -33,10 +33,10 @@ math.import(
 export const Calc: Command = {
   category: "Utility",
   clientPermissions: ["SEND_MESSAGES"],
-  name: "calc",
-  aliases: ["calculate", "math", "mathematic", "mathematics", "maths"],
-  description: (guild) => "Calculates something",
-  examples: ["calc 1+1", "calc 100*5"],
+  name: "command.calc.name",
+  aliases: "command.calc.aliases",
+  description: "command.calc.description",
+  examples: ["{command.calc.name} 1+1", "{command.calc.name} 100*5"],
   editable: true,
   args: [
     {

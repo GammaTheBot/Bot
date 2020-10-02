@@ -1,15 +1,19 @@
 import { Language, Lang } from "../../languages/Language";
-import { ArgType, Command, commands, categories } from "../commandLoader";
+import {
+  ArgType,
+  Command,
+  commands,
+  categories,
+  aliasesToString,
+} from "../commandLoader";
 import Discord from "discord.js";
 import { Guilds } from "../../Guilds";
 
 export var Help: Command = {
   category: "Utility",
-  name: "help",
-  usage: "help [command]",
+  name: "command.help.name",
   editable: true,
-  description: (guild) =>
-    Language.getNode(guild, ["command", "help", "description"]),
+  description: "command.help.description",
   clientPermissions: [],
   args: [
     {
@@ -33,18 +37,25 @@ export var Help: Command = {
           `The prefix of this bot is \`${prefix}\` and the user tag of the bot. For example \`@Gamma help\` or \`${prefix}help\`. Execute \`!help <command>\` to find information on specific commands!`
         )
         .setAuthor(message.author.tag, message.author.displayAvatarURL());
-      for (const key of Object.values(categories)) {
+      for await (const key of Object.values(categories)) {
         if (key.commands) {
+          const cmds: string[] = [];
+          for await (const cmd of key.commands) {
+            const node = await Language.getNode(message.guild?.id, cmd.name);
+            cmds.push(node);
+          }
           helpEmbed.addField(
-            `${key.name}`,
-            `${key.commands.map((e) => `\`${e.name}\``).join(", ")}`
+            `${await Language.replaceNodes(message.guild?.id, key.name)}`,
+            `\`${cmds.join("`, `")}\``
           );
         }
       }
       return message.channel.send(helpEmbed);
     }
     const cmd = commands.find(
-      (c) => c.name === command || c.aliases?.includes(command)
+      async (c) =>
+        c.name === command ||
+        (await aliasesToString(message.guild?.id, c.aliases)).includes(command)
     );
     const helpEmbed = new Discord.MessageEmbed()
       .setColor("BLUE")
@@ -52,20 +63,25 @@ export var Help: Command = {
       .setTimestamp()
       .setAuthor(message.author.tag, message.author.displayAvatarURL())
       .setDescription(
-        `Name: \`${cmd.name}\`` +
-          `${
-            cmd.aliases
-              ? `\n${
-                  cmd.aliases.length > 1 ? `Aliases: ` : `Alias:`
-                } \`${cmd.aliases.join(", ")}\``
-              : ``
-          }` +
-          `${cmd.usage ? `\nUsage: \`${prefix}${cmd.usage}\`` : ``}` +
-          `\nCategory: \`${cmd.category}\`` +
-          `\n\nDescription: \`${cmd.description(message.guild.id)}\`` +
-          `\n${
-            cmd.examples.length > 1 ? `Examples: ` : `Example: `
-          } ${cmd.examples.map((m) => `\`${m}\``).join(", ")}`
+        `**Name:** ${await Language.getNode(message.guild?.id, cmd.name)}\n
+        **Description:** ${await Language.getNode(
+          message.guild?.id,
+          cmd.name
+        )}\n
+        **Usage:** ${await Language.replaceNodes(
+          message.guild?.id,
+          cmd.usage
+        )}\n
+        **Aliases:** \`${(
+          await aliasesToString(message.guild?.id, cmd.aliases)
+        ).join(`\`, \``)}\`\n
+        **Category:** ${await Language.getNode(
+          message.guild?.id,
+          cmd.category
+        )}\n
+        **Examples:** \`${(
+          await aliasesToString(message.guild?.id, cmd.examples)
+        ).join(`\`, \``)}\`\n`
       );
     return message.channel.send(helpEmbed);
   },

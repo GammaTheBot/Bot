@@ -1,10 +1,25 @@
 command:
   eval:
     description: Evaluates code
+    name: eval
+    aliases: ["evaluate"]
   help:
     description: Lists and describes the commands the bot contains
+    name: "help"
+    examples: ["help", "help prefix"]
   prefix:
-    description: Get the bot's prefix
+    name: prefix
+    description: Get/set the bot's prefix
+    examples: ["prefix", "prefix -"]
+  ping:
+    name: ping
+    description: Get the bot's ping
+    aliases: ["pong"]
+    examples: ["ping"]
+  calc:
+    name: calc
+    description: Calculate a math expression
+    aliases: ["calculate", "math", "mathematic", "mathematics", "maths"]
   unknown: Command not found! Maybe you meant {cmd}
   missing-args: Command {arg} {args} missing!
   arg: argument
@@ -14,3 +29,10 @@ noperms:
   guildowner: Only the guild owner can do this!
   general: You don't have enough permissions to do this!
   bot: The bot doesn't have enough permissions to do this!
+categories:
+  Utility:
+    name: Utility
+    description: Some useful commands
+  Games:
+    name: Games
+    description: Game-related commands

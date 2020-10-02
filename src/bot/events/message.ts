@@ -1,10 +1,17 @@
 import { bot } from "../bot";
 import config from "../../config.json";
-import { Arg, ArgType, commands, commandsRunEdit } from "../commandLoader";
+import {
+  aliasesToString,
+  Arg,
+  ArgType,
+  Command,
+  commands,
+  commandsRunEdit,
+} from "../commandLoader";
 import Discord, { Message } from "discord.js";
 import { GuildData } from "../../database/schemas/guilds";
 import { Perms } from "../../Perms";
-import { Lang, Language } from "../../languages/Language";
+import { Language } from "../../languages/Language";
 import { Utils } from "../../Utils";
 import stringSimilarity from "string-similarity";
 import { Guilds } from "../../Guilds";
@@ -36,9 +43,16 @@ async function handleCommand(message: Message) {
     }
   }
   if (cmd == null) return;
-  const command = commands.find(
-    (c) => c.name === cmd || c.aliases?.includes(cmd)
-  );
+  let command: Command;
+  for await (const c of commands) {
+    const name = await Language.getNode(message.guild?.id, c.name);
+    const aliases = await aliasesToString(message.guild?.id, c.aliases);
+    const result = name === cmd || aliases?.includes(cmd);
+    if (result === true) {
+      command = c;
+      break;
+    }
+  }
   if (command) {
     if (!command.dms && message.channel.type === "dm")
       return message.channel.send(
@@ -126,7 +140,9 @@ async function handleCommand(message: Message) {
         (a) => !a.optional
       );
       if (missingArgs.length > 0) {
-        const usage = [`${command.name}\``];
+        const usage = [
+          `${await Language.getNode(message.guild?.id, command.name)}\``,
+        ];
         for (const arg of command.args) {
           const t = arg.name || arg.type;
           if (missingArgs.includes(arg)) {
@@ -139,7 +155,7 @@ async function handleCommand(message: Message) {
           .setColor(await Guilds.getColor(message.guild?.id))
           .setTimestamp()
           .setAuthor(message.author.tag, message.author.displayAvatarURL())
-          .setDescription(`Arguments missing!\n\`${prefix} ${usage.join("")}`);
+          .setDescription(`Arguments missing!\n\`${prefix}${usage.join("")}`);
         return message.channel.send(embed);
       }
     }
@@ -151,10 +167,9 @@ async function handleCommand(message: Message) {
     );
     const str = bestMatch.bestMatch.target;
     return message.channel.send(
-      Language.getNode(message.guild?.id, ["command", "unknown"]).replace(
-        "{cmd}",
-        `\`${str}\``
-      )
+      (
+        await Language.getNode(message.guild?.id, ["command", "unknown"])
+      ).replace("{cmd}", `\`${str}\``)
     );
   }
 }

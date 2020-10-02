@@ -5,14 +5,13 @@ const bot = require("../../bot").bot;
 
 export var Eval: Command = {
   category: "Utility",
-  name: "eval",
+  name: "command.eval.name",
   editable: true,
-  description: (guild) =>
-    Language.getNode(guild, ["command", "eval", "description"]),
-  aliases: ["evaluate"],
+  description: "command.eval.description",
+  aliases: "command.eval.aliases",
   clientPermissions: [],
   botOwnerOnly: true,
-  examples: ["eval 1+1"],
+  examples: ["{command.eval.name} true"],
   args: [
     {
       unordered: false,

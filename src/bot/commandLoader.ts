@@ -1,6 +1,7 @@
 import { Message, PermissionResolvable } from "discord.js";
 import { promises as fs } from "fs";
 import { Type } from "yaml/util";
+import { Language } from "../languages/Language";
 import { BotPermissions } from "../Perms";
 
 export const commands: Command[] = [];
@@ -54,6 +55,10 @@ function loadCommand(cmd: Command) {
   }
   commands.push(cmd);
   if (cmd.editable) commandsRunEdit.push(cmd);
+  if (!categories[cmd.category]) {
+    console.error(`Category ${cmd.category} not found!`);
+    return;
+  }
   if (!categories[cmd.category].commands) {
     categories[cmd.category].commands = [cmd];
   } else categories[cmd.category].commands.push(cmd);
@@ -92,10 +97,10 @@ export interface Arg {
 export interface Command {
   name: string;
   usage?: string;
-  description(guild?: string): string;
-  aliases?: string[];
+  description: string;
+  aliases?: string | string[];
   dms?: boolean | true;
-  examples: string[];
+  examples: string | string[];
   editable?: boolean | true;
   category: string;
   botOwnerOnly?: boolean;
@@ -104,4 +109,18 @@ export interface Command {
   userPermissions?: BotPermissions | BotPermissions[];
   args?: Arg[];
   exec(message: Message, args: any): Promise<any> | any | void;
+}
+
+export async function aliasesToString(
+  guildId: string,
+  aliases: string | string[]
+): Promise<string[]> {
+  if (!aliases) return null;
+  if (typeof aliases === "string")
+    return [await Language.getNode(guildId, aliases)];
+  const result = [];
+  for (const alias of aliases) {
+    result.push(await Language.replaceNodes(guildId, alias));
+  }
+  return result;
 }
