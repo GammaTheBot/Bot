@@ -48,3 +48,10 @@ categories:
     name: Modules
     description: Commands to manage modules
 help: Help
+name: Name
+usage: Usage
+description: Description
+category: Category
+examples: Examples
+subcommands: Subcommands
+aliases: Aliases

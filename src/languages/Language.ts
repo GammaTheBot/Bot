@@ -22,7 +22,7 @@ export const Language = {
   getNode: async (
     guildId: string,
     subnodess: string[] | string
-  ): Promise<string> => {
+  ): Promise<any> => {
     try {
       let language =
         (await Utils.getDoc(guildId, "guildData", 1000))?.language ||

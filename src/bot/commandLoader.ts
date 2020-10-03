@@ -38,7 +38,7 @@ async function loadCommands(dir: string): Promise<any> {
 
 export function getUsage(cmd: Command): string {
   if (!cmd.usage) {
-    const usage = [cmd.name];
+    const usage = [`{${cmd.name}}`];
     if (cmd.args)
       for (const arg of cmd.args) {
         const t = arg.name || arg.type;
@@ -97,8 +97,6 @@ export enum ArgType { //You can choose different arg type
   number = "number",
 }
 
-
-
 export interface Arg {
   type: ArgType;
   match?: "everything" | "others";
@@ -130,8 +128,11 @@ export async function aliasesToString(
   aliases: string | string[]
 ): Promise<string[]> {
   if (!aliases) return null;
-  if (typeof aliases === "string")
-    return [await Language.getNode(guildId, aliases)];
+  console.log(aliases);
+  if (typeof aliases === "string") {
+    const alises = await Language.getNode(guildId, aliases);
+    return typeof alises === "string" ? [alises] : alises;
+  }
   const result = [];
   for (const alias of aliases) {
     result.push(await Language.replaceNodes(guildId, alias));

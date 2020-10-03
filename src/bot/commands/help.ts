@@ -4,13 +4,12 @@ import {
   Command,
   commands,
   categories,
+  getCommand,
   aliasesToString,
   getUsage,
-  getCommand,
 } from "../commandLoader";
 import Discord from "discord.js";
 import { Guilds } from "../../Guilds";
-import { Utils } from "../../Utils";
 import { bot } from "../bot";
 
 export var Help: Command = {
@@ -66,5 +65,72 @@ export var Help: Command = {
       }
       return message.channel.send(embed.setDescription(description));
     }
+    const cmd = await getCommand(command, message.guild?.id, commands);
+    const embed = new Discord.MessageEmbed()
+      .setAuthor(message.author.tag, message.author.displayAvatarURL())
+      .setTimestamp()
+      .setColor(await Guilds.getColor(message.guild?.id))
+      .setTitle(
+        bot.user.username +
+          " " +
+          (await Language.replaceNodes(message.guild?.id, "help"))
+      );
+    let description = [
+      `**${await Language.getNode(
+        message.guild?.id,
+        "name"
+      )}:** ${await Language.getNode(message.guild?.id, cmd.name)}`,
+    ];
+    if (cmd.description)
+      description.push(
+        `**${await Language.getNode(
+          message.guild?.id,
+          "description"
+        )}:** ${await Language.getNode(message.guild?.id, cmd.description)}`
+      );
+    if (cmd.usage)
+      description.push(
+        `**${await Language.getNode(
+          message.guild?.id,
+          "usage"
+        )}:** ${await Language.replaceNodes(message.guild?.id, cmd.usage)}`
+      );
+    if (cmd.aliases)
+      description.push(
+        `**${await Language.getNode(message.guild?.id, "aliases")}:** \`${(
+          await aliasesToString(message.guild?.id, cmd.aliases)
+        ).join("`, `")}\``
+      );
+    if (cmd.category)
+      description.push(
+        `**${await Language.getNode(
+          message.guild?.id,
+          "category"
+        )}:** ${await Language.replaceNodes(
+          message.guild?.id,
+          categories[cmd.category].name
+        )}`
+      );
+    if (cmd.examples)
+      description.push(
+        `**${await Language.getNode(
+          message.guild?.id,
+          "examples"
+        )}:** \`${await aliasesToString(message.guild?.id, cmd.examples)}\``
+      );
+    if (cmd.subcommands)
+      description.push(
+        `**${await Language.getNode(message.guild?.id, "subcommands")}:**\n${(
+          await aliasesToString(
+            message.guild?.id,
+            cmd.subcommands.map((s) => {
+              console.log(getUsage(s));
+              return `• \`${getUsage(s)}\``;
+            })
+          )
+        ).join("\n")}`
+      );
+    embed.setDescription(description.join("\n"));
+    return message.channel.send(embed);
   },
 };
