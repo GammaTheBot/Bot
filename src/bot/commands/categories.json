@@ -6,5 +6,9 @@
   "Games": {
     "name": "🎮 {categories.Games.name}",
     "description": "{categories.Games.description}"
+  },
+  "Modules": {
+    "name": "⚙️ {categories.Modules.name}",
+    "description": "{categories.Modules.description}"
   }
 }

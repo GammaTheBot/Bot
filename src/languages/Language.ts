@@ -23,28 +23,32 @@ export const Language = {
     guildId: string,
     subnodess: string[] | string
   ): Promise<string> => {
-    let language =
-      (await Utils.getDoc(guildId, "guildData", 1000))?.language ||
-      Lang.English;
-    let subnodes: string[] = [];
-    if (typeof subnodess === "string") subnodes = subnodess.split(".");
-    else subnodes = subnodess;
-    subnodess = <string[]>subnodess;
-    if (guildId) {
-      let txt: any = nodes[language];
+    try {
+      let language =
+        (await Utils.getDoc(guildId, "guildData", 1000))?.language ||
+        Lang.English;
+      let subnodes: string[] = [];
+      if (typeof subnodess === "string") subnodes = subnodess.split(".");
+      else subnodes = subnodess;
+      subnodess = <string[]>subnodess;
+      if (guildId) {
+        let txt: any = nodes[language];
+        subnodes.forEach((node) => {
+          txt = txt?.[node];
+        });
+        if (txt) return txt;
+      }
+      let txt: any = nodes[Lang.English];
       subnodes.forEach((node) => {
-        txt = txt?.[node];
+        txt = txt[node];
       });
       if (txt) return txt;
+      return `❗ Invalid language node (${subnodes.join(
+        "."
+      )}, ${language})! Please report this to the Gamma discord server (https://discord.gg/XNDAw7Y)`;
+    } catch (err) {
+      console.error(subnodess);
     }
-    let txt: any = nodes[Lang.English];
-    subnodes.forEach((node) => {
-      txt = txt[node];
-    });
-    if (txt) return txt;
-    return `❗ Invalid language node (${subnodes.join(
-      "."
-    )}, ${language})! Please report this to the Gamma discord server (https://discord.gg/XNDAw7Y)`;
   },
   replaceNodes: async (guildId: string, text: string): Promise<string> => {
     for (let i = 0; i < text.length; i++) {
@@ -59,5 +63,12 @@ export const Language = {
       }
     }
     return text;
+  },
+  parseNodes: async (
+    guildId: string,
+    subnodes: string[] | string
+  ): Promise<string> => {
+    const node = await Language.getNode(guildId, subnodes);
+    return await Language.replaceNodes(guildId, node);
   },
 };

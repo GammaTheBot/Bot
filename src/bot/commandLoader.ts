@@ -36,6 +36,37 @@ async function loadCommands(dir: string): Promise<any> {
   }
 }
 
+export function getUsage(cmd: Command): string {
+  if (!cmd.usage) {
+    const usage = [cmd.name];
+    if (cmd.args)
+      for (const arg of cmd.args) {
+        const t = arg.name || arg.type;
+        usage.push(arg.optional ? `[${t}]` : `<${t}>`);
+      }
+    return usage.join(" ");
+  }
+  return cmd.usage;
+}
+
+export async function getCommand(
+  str: string,
+  guildId: string,
+  commands: Command[]
+): Promise<Command> {
+  let command: Command;
+  for await (const c of commands) {
+    const name = await Language.getNode(guildId, c.name);
+    const aliases = await aliasesToString(guildId, c.aliases);
+    const result = name === str || aliases?.includes(str);
+    if (result === true) {
+      command = c;
+      break;
+    }
+  }
+  return command;
+}
+
 function loadCommand(cmd: Command) {
   if (cmd.args)
     for (const arg of cmd.args) {
@@ -44,15 +75,7 @@ function loadCommand(cmd: Command) {
         return;
       }
     }
-  if (!cmd.usage) {
-    const usage = [cmd.name];
-    if (cmd.args)
-      for (const arg of cmd.args) {
-        const t = arg.name || arg.type;
-        usage.push(arg.optional ? `[${t}]` : `<${t}>`);
-      }
-    cmd.usage = usage.join(" ");
-  }
+  cmd.usage = getUsage(cmd);
   commands.push(cmd);
   if (cmd.editable) commandsRunEdit.push(cmd);
   if (!categories[cmd.category]) {
@@ -74,41 +97,32 @@ export enum ArgType { //You can choose different arg type
   number = "number",
 }
 
-export interface ArgPromptOptions {
-  cancelWord: string | "cancel";
-  start(message: Message): string;
-  retry(message: Message): string;
-  timeout(): string;
-  cancel(): string;
-  ended(): string;
-  retries: number | 1;
-  time: number | 30000;
-}
+
 
 export interface Arg {
   type: ArgType;
   match?: "everything" | "others";
   optional?: boolean;
   unordered?: boolean | number;
-  prompt?: ArgPromptOptions;
   name: string;
 }
 
 export interface Command {
   name: string;
   usage?: string;
-  description: string;
+  description?: string;
   aliases?: string | string[];
   dms?: boolean | true;
-  examples: string | string[];
+  examples?: string | string[];
   editable?: boolean | true;
-  category: string;
+  category?: string;
   botOwnerOnly?: boolean;
   guildOwnerOnly?: boolean;
-  clientPermissions: PermissionResolvable | PermissionResolvable[];
+  clientPermissions?: PermissionResolvable | PermissionResolvable[];
   userPermissions?: BotPermissions | BotPermissions[];
   args?: Arg[];
-  exec(message: Message, args: any): Promise<any> | any | void;
+  exec(message: Message, args?: any): Promise<any> | any | void;
+  subcommands?: Command[];
 }
 
 export async function aliasesToString(
