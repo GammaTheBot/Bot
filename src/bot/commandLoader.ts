@@ -1,5 +1,6 @@
 import { Message, PermissionResolvable } from "discord.js";
 import { promises as fs } from "fs";
+import { getOriginalNode } from "typescript";
 import { Type } from "yaml/util";
 import { Language } from "../languages/Language";
 import { BotPermissions } from "../Perms";
@@ -95,6 +96,7 @@ export enum ArgType { //You can choose different arg type
   lowercase = "lowercase",
   string = "string",
   number = "number",
+  role = "role",
 }
 
 export interface Arg {
@@ -138,4 +140,21 @@ export async function aliasesToString(
     result.push(await Language.replaceNodes(guildId, alias));
   }
   return result;
+}
+
+export function convertType(arg: string, type: ArgType) {
+  if (arg?.length < 1) return null;
+  switch (type) {
+    case "string":
+      return arg;
+    case "lowercase":
+      return arg.toLowerCase();
+    case "uppercase":
+      return arg.toUpperCase();
+    case "number":
+      const n = Number(arg);
+      return isNaN(n) ? null : n;
+    default:
+      return arg;
+  }
 }

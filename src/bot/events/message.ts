@@ -1,22 +1,20 @@
-import { bot } from "../bot";
+import Discord, { Message } from "discord.js";
+import stringSimilarity from "string-similarity";
 import config from "../../config.json";
+import { GuildData } from "../../database/schemas/guilds";
+import { Guilds } from "../../Guilds";
+import { Language } from "../../languages/Language";
+import { Perms } from "../../Perms";
+import { Utils } from "../../Utils";
+import { bot } from "../bot";
 import {
-  aliasesToString,
   Arg,
-  ArgType,
   Command,
   commands,
   commandsRunEdit,
+  convertType,
   getCommand,
 } from "../commandLoader";
-import Discord, { Message } from "discord.js";
-import { GuildData } from "../../database/schemas/guilds";
-import { Perms } from "../../Perms";
-import { Language } from "../../languages/Language";
-import { Utils } from "../../Utils";
-import stringSimilarity from "string-similarity";
-import { Guilds } from "../../Guilds";
-import { messagesToHtml } from "../messagesToHtml/messagesToHtml";
 
 bot.on("message", async (message) => {
   // All code after this is for the command
@@ -198,23 +196,6 @@ function parseArgs(argss: Arg[], unparsedArgs: string[]) {
   const missingArgs = [...args, ...unorderedArgs].filter((a) => !a.optional);
   if (missingArgs.length > 0) return { error: true, missingArgs };
   return result;
-}
-
-function convertType(arg: string, type: ArgType) {
-  if (arg?.length < 1) return null;
-  switch (type) {
-    case "string":
-      return arg;
-    case "lowercase":
-      return arg.toLowerCase();
-    case "uppercase":
-      return arg.toUpperCase();
-    case "number":
-      const n = Number(arg);
-      return isNaN(n) ? null : n;
-    default:
-      return arg;
-  }
 }
 
 bot.on("messageUpdate", async (oldMessage, newMessage) => {

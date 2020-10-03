@@ -28,6 +28,14 @@ command:
     name: calc
     description: Calculate a math expression
     aliases: ["calculate", "math", "mathematic", "mathematics", "maths"]
+  permissions:
+    name: permissions
+    aliases: ["perms"]
+    description: Manage the role permissions
+    add:
+      name: add
+    remove:
+      name: remove
   unknown: Command not found! Maybe you meant {cmd}
   missing-args: "{command.args} missing!"
   arg: Argument
@@ -55,3 +63,62 @@ category: Category
 examples: Examples
 subcommands: Subcommands
 aliases: Aliases
+permissions: Permissions
+perms:
+  botAdministrator:
+    name: bot administrator
+    description: Gives access to all the bot features
+  kick:
+    name: kick
+    description: Gives access to the kick command
+  mute:
+    name: mute
+    description: Gives access to the mute command
+  ban:
+    name: ban
+    description: Gives access to the ban command
+  bypassFilter:
+    name: bypass filter
+    description: Bypass the chat filter
+  musicManager:
+    name: music manager
+    description: Manage the music
+  dj:
+    name: dj
+    description: Bypass the music thresholds
+  punishments:
+    name: punishments
+    description: Access to the case and punishments commands
+  clear:
+    name: clear
+    description: Access to the clear command
+  counting:
+    name: counting
+    description: Manage the counting settings
+  logging:
+    name: logging
+    description: Manage the logging settings
+  loginFlow:
+    name: login flow
+    description: Manage the login flow
+  suggestions:
+    name: suggestions
+    description: Manage the suggestions system
+  customCommands:
+    name: custom commands
+    description: Manage custom commands
+  starboard:
+    name: starboard
+    description: Manage the starboard system
+  roles:
+    name: roles
+    description: Manage the roles (Reaction roles, etc.)
+  experience:
+    name: experience
+    description: Manage the chat experience system
+  managePermissions:
+    name: manage permissions
+    description: Access to the permissions command
+  embeds:
+    name: embeds
+    description: Manage the custom embeds

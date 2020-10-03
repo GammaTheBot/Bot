@@ -8,7 +8,7 @@ import {
   aliasesToString,
   getUsage,
 } from "../commandLoader";
-import Discord from "discord.js";
+import Discord, { Message } from "discord.js";
 import { Guilds } from "../../Guilds";
 import { bot } from "../bot";
 
@@ -75,62 +75,69 @@ export var Help: Command = {
           " " +
           (await Language.replaceNodes(message.guild?.id, "help"))
       );
-    let description = [
-      `**${await Language.getNode(
-        message.guild?.id,
-        "name"
-      )}:** ${await Language.getNode(message.guild?.id, cmd.name)}`,
-    ];
-    if (cmd.description)
-      description.push(
-        `**${await Language.getNode(
-          message.guild?.id,
-          "description"
-        )}:** ${await Language.getNode(message.guild?.id, cmd.description)}`
-      );
-    if (cmd.usage)
-      description.push(
-        `**${await Language.getNode(
-          message.guild?.id,
-          "usage"
-        )}:** ${await Language.replaceNodes(message.guild?.id, cmd.usage)}`
-      );
-    if (cmd.aliases)
-      description.push(
-        `**${await Language.getNode(message.guild?.id, "aliases")}:** \`${(
-          await aliasesToString(message.guild?.id, cmd.aliases)
-        ).join("`, `")}\``
-      );
-    if (cmd.category)
-      description.push(
-        `**${await Language.getNode(
-          message.guild?.id,
-          "category"
-        )}:** ${await Language.replaceNodes(
-          message.guild?.id,
-          categories[cmd.category].name
-        )}`
-      );
-    if (cmd.examples)
-      description.push(
-        `**${await Language.getNode(
-          message.guild?.id,
-          "examples"
-        )}:** \`${await aliasesToString(message.guild?.id, cmd.examples)}\``
-      );
-    if (cmd.subcommands)
-      description.push(
-        `**${await Language.getNode(message.guild?.id, "subcommands")}:**\n${(
-          await aliasesToString(
-            message.guild?.id,
-            cmd.subcommands.map((s) => {
-              console.log(getUsage(s));
-              return `• \`${getUsage(s)}\``;
-            })
-          )
-        ).join("\n")}`
-      );
-    embed.setDescription(description.join("\n"));
+    embed.setDescription(await getCmdHelp(cmd, message));
     return message.channel.send(embed);
   },
 };
+
+export async function getCmdHelp(
+  cmd: Command,
+  message: Message
+): Promise<string> {
+  let description = [
+    `**${await Language.getNode(
+      message.guild?.id,
+      "name"
+    )}:** ${await Language.getNode(message.guild?.id, cmd.name)}`,
+  ];
+  if (cmd.description)
+    description.push(
+      `**${await Language.getNode(
+        message.guild?.id,
+        "description"
+      )}:** ${await Language.getNode(message.guild?.id, cmd.description)}`
+    );
+  if (cmd.usage)
+    description.push(
+      `**${await Language.getNode(
+        message.guild?.id,
+        "usage"
+      )}:** ${await Language.replaceNodes(message.guild?.id, cmd.usage)}`
+    );
+  if (cmd.aliases)
+    description.push(
+      `**${await Language.getNode(message.guild?.id, "aliases")}:** \`${(
+        await aliasesToString(message.guild?.id, cmd.aliases)
+      ).join("`, `")}\``
+    );
+  if (cmd.category)
+    description.push(
+      `**${await Language.getNode(
+        message.guild?.id,
+        "category"
+      )}:** ${await Language.replaceNodes(
+        message.guild?.id,
+        categories[cmd.category].name
+      )}`
+    );
+  if (cmd.examples)
+    description.push(
+      `**${await Language.getNode(
+        message.guild?.id,
+        "examples"
+      )}:** \`${await aliasesToString(message.guild?.id, cmd.examples)}\``
+    );
+  if (cmd.subcommands)
+    description.push(
+      `**${await Language.getNode(message.guild?.id, "subcommands")}:**\n${(
+        await aliasesToString(
+          message.guild?.id,
+          cmd.subcommands.map((s) => {
+            console.log(getUsage(s));
+            return `• \`${getUsage(s)}\``;
+          })
+        )
+      ).join("\n")}`
+    );
+  return description.join("\n");
+}

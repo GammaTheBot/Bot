@@ -1,5 +1,15 @@
 import { Command } from "../../commandLoader";
 
+const logTypes = {
+  emojis: "Emoji creation/deletion/updates",
+  bans: "Ban creation/removal",
+  messages: "Message deletion / edits",
+  roles: "Role creation/deletion/updates",
+  channels: "Channel creation/deletion/updates",
+  invites: "Invite creation/deletion",
+  nicknames: "Nickname edits",
+};
+
 const LoggingSet: Command = {
   name: "command.logging.set.name",
   clientPermissions: "SEND_MESSAGES",
