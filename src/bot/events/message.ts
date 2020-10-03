@@ -116,7 +116,7 @@ async function handleCommand(
     }
   }
   if (command.args) {
-    result = parseArgs(command.args, unparsedArgs);
+    result = parseArgs(command.args, unparsedArgs, message);
     if (result.error) {
       const missingArgs: Arg[] = result.missingArgs;
       const usage = [
@@ -145,7 +145,7 @@ async function handleCommand(
   }
   command.exec(message, result);
 }
-function parseArgs(argss: Arg[], unparsedArgs: string[]) {
+function parseArgs(argss: Arg[], unparsedArgs: string[], message: Message) {
   const result = {};
   let args = [...argss];
 
@@ -157,14 +157,14 @@ function parseArgs(argss: Arg[], unparsedArgs: string[]) {
       continue;
     }
     if (arg.match === "everything") {
-      const casted = convertType(unparsedArgs.join(" "), arg.type);
+      const casted = convertType(unparsedArgs.join(" "), arg.type, message);
       if (casted != null) {
         args.shift();
         result[arg.name] = casted;
         break;
       }
     } else {
-      const casted = convertType(unparsedArgs.shift(), arg.type);
+      const casted = convertType(unparsedArgs.shift(), arg.type, message);
       if (casted != null) {
         args.shift();
         result[arg.name] = casted;
@@ -172,12 +172,13 @@ function parseArgs(argss: Arg[], unparsedArgs: string[]) {
       }
     }
     const unordered = unorderedArgs.findIndex(
-      (a) => convertType(unparsedArgs[0], a.type) != null
+      (a) => convertType(unparsedArgs[0], a.type, message) != null
     );
     if (unordered >= 0) {
       result[arg.name] = convertType(
         unparsedArgs[0],
-        unorderedArgs[unordered].type
+        unorderedArgs[unordered].type,
+        message
       );
       args.shift();
       unorderedArgs.splice(unordered, 1);
@@ -185,7 +186,7 @@ function parseArgs(argss: Arg[], unparsedArgs: string[]) {
   }
   for (let unpArg of unparsedArgs) {
     for (const arg of unorderedArgs) {
-      const casted = convertType(unpArg, arg.type);
+      const casted = convertType(unpArg, arg.type, message);
       if (casted != null) {
         result[arg.name] = casted;
         unorderedArgs.shift();

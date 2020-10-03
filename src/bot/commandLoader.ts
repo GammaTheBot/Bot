@@ -4,6 +4,7 @@ import { getOriginalNode } from "typescript";
 import { Type } from "yaml/util";
 import { Language } from "../languages/Language";
 import { BotPermissions } from "../Perms";
+import { bot } from "./bot";
 
 export const commands: Command[] = [];
 
@@ -97,6 +98,7 @@ export enum ArgType { //You can choose different arg type
   string = "string",
   number = "number",
   role = "role",
+  channel = "channel",
 }
 
 export interface Arg {
@@ -142,7 +144,7 @@ export async function aliasesToString(
   return result;
 }
 
-export function convertType(arg: string, type: ArgType) {
+export function convertType(arg: string, type: ArgType, message: Message) {
   if (arg?.length < 1) return null;
   switch (type) {
     case "string":
@@ -154,6 +156,17 @@ export function convertType(arg: string, type: ArgType) {
     case "number":
       const n = Number(arg);
       return isNaN(n) ? null : n;
+    case "channel": {
+      const id = arg.replace(/[<#>]/gi, "");
+      const channel =
+        message.guild.channels.cache.get(id) || bot.channels.cache.get(id);
+      return channel;
+    }
+    case "role": {
+      const id = arg.replace(/[<@>]/gi, "");
+      const role = message.guild.roles.cache.get(id);
+      return role;
+    }
     default:
       return arg;
   }

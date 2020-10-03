@@ -239,9 +239,3 @@ export function objDifference(
   }
   return r;
 }
-
-export function unicodeToEmoji(text) {
-  return text.replace(/\\u[\dA-F]{4}/gi, (m) =>
-    String.fromCharCode(parseInt(m.replace(/\\u/g, ""), 16))
-  );
-}
