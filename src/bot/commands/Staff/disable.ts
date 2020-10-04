@@ -44,7 +44,7 @@ export const Disable: Command = {
       return message.channel.send(
         await Language.getNode(message.guild.id, "command.unknown")
       );
-    const disabled = await isDisabled(
+    let disabled = await isDisabled(
       command,
       message.channel as Discord.TextChannel
     );
@@ -66,7 +66,7 @@ export const Disable: Command = {
             [`text.${channel.id}.commands.disabled`]: cmdsByLang[command],
           },
           $pull: {
-            [`text.'${channel.id}'.commands.enabled`]: cmdsByLang[command],
+            [`text.${channel.id}.commands.enabled`]: cmdsByLang[command],
           },
         },
         { upsert: true }
@@ -78,7 +78,10 @@ export const Disable: Command = {
         { upsert: true }
       );
     }
-    console.log(disabled);
+    disabled = await isDisabled(
+      command,
+      message.channel as Discord.TextChannel
+    );
     const node =
       disabled[1] === "channel"
         ? "command.disable.successChannel"

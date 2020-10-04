@@ -8,6 +8,7 @@ import {
   aliasesToString,
   getUsage,
   BaseCommand,
+  isDisabled,
 } from "../commandLoader";
 import Discord, { Message } from "discord.js";
 import { Guilds } from "../../Guilds";
@@ -55,7 +56,13 @@ export var Help: Command = {
         const cmds: string[] = [];
         if (category.commands)
           for await (const cmd of category.commands) {
-            cmds.push(await Language.getNode(message.guild?.id, cmd.name));
+            cmds.push(
+              ((
+                await isDisabled(cmd.id, message.channel as Discord.TextChannel)
+              )[0]
+                ? "🔒 "
+                : "") + (await Language.getNode(message.guild?.id, cmd.name))
+            );
           }
         stuff += `${await Language.replaceNodes(
           message.guild?.id,
