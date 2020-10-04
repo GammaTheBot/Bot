@@ -58,12 +58,20 @@ export const Disable: Command = {
           ).replace(/\{cmd\}/gi, command)
         );
       }
+      if (disabled[1] === "guild") {
+        await ChannelData.updateOne(
+          { _id: message.guild.id },
+          {
+            $addToSet: {
+              [`text.${channel.id}.commands.enabled`]: cmdsByLang[command],
+            },
+          },
+          { upsert: true }
+        );
+      }
       await ChannelData.updateOne(
         { _id: message.guild.id },
         {
-          $addToSet: {
-            [`text.${channel.id}.commands.enabled`]: cmdsByLang[command],
-          },
           $pull: {
             [`text.${channel.id}.commands.disabled`]: cmdsByLang[command],
           },
