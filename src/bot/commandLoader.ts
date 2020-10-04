@@ -3,8 +3,10 @@ import {
   GuildChannel,
   Message,
   PermissionResolvable,
+  TextChannel,
 } from "discord.js";
 import { promises as fs } from "fs";
+import { ChannelData } from "../database/schemas/channels";
 import { Language } from "../languages/Language";
 import { BotPermissions } from "../Perms";
 import { Utils } from "../Utils";
@@ -29,10 +31,10 @@ async function loadCommands(dir: string): Promise<any> {
     // Cool ECMAScript feature
     if (file.endsWith(".ts")) {
       const cmds = await import(`${dir}/${file}`);
-      for (const v of Object.values(cmds)) {
-        const cmd = <Command>v;
+      for (const v of Object.entries(cmds)) {
+        const cmd = <Command>v[1];
         if ("category" in cmd) {
-          loadCommand(cmd);
+          loadCommand(cmd, v[0]);
         }
       }
     } else if (!file.includes(".")) {
@@ -72,7 +74,7 @@ export async function getCommand(
   return command;
 }
 
-function loadCommand(cmd: Command) {
+function loadCommand(cmd: Command, id: string) {
   if (cmd.args)
     for (const arg of cmd.args) {
       if (arg.unordered && arg.match === "everything") {
@@ -81,6 +83,7 @@ function loadCommand(cmd: Command) {
       }
     }
   cmd.usage = getUsage(cmd);
+  if (!cmd.id) cmd.id = id;
   commands.push(cmd);
   if (cmd.editable) commandsRunEdit.push(cmd);
   if (!categories[cmd.category]) {
@@ -133,6 +136,7 @@ export interface Command extends BaseCommand {
   examples?: string | string[];
   editable?: boolean | true;
   category: string;
+  id?: string;
 }
 
 export async function aliasesToString(
@@ -195,4 +199,22 @@ export function convertType(
     default:
       return arg;
   }
+}
+
+export async function isDisabled(
+  thing: string,
+  channel: TextChannel
+): Promise<[boolean, "channel" | "guild"]> {
+  thing = thing.toLowerCase();
+  const doc = await ChannelData.findById(channel.guild.id);
+  const disabledGuildCmds = [];
+  const disabledChannelCmds = [];
+  if (doc?.disabledCommands) disabledGuildCmds.push(...doc?.disabledCommands);
+  if (doc?.text?.[channel.id]?.commands?.disabled)
+    disabledChannelCmds.push(doc?.text?.[channel.id]?.commands?.disabled);
+  const enabledCmds = doc?.text?.[channel.id]?.commands?.enabled;
+  if (enabledCmds?.includes(thing)) return [false, null];
+  if (disabledChannelCmds?.includes(thing)) return [true, "channel"];
+  else if (disabledGuildCmds?.includes(thing)) return [true, "guild"];
+  else return [false, null];
 }

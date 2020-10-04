@@ -1,4 +1,4 @@
-import Discord, { Message } from "discord.js";
+import Discord, { Message, TextChannel } from "discord.js";
 import stringSimilarity from "string-similarity";
 import config from "../../config.json";
 import { GuildData } from "../../database/schemas/guilds";
@@ -14,6 +14,7 @@ import {
   commandsRunEdit,
   convertType,
   getCommand,
+  isDisabled,
 } from "../commandLoader";
 
 bot.on("message", async (message) => {
@@ -52,10 +53,10 @@ async function startCommandParsing(message: Message) {
       commands.map((c) => c.name)
     );
     const str = bestMatch.bestMatch.target;
-    const unknownCmdMsg = await Language.getNode(
-      message.guild?.id,
-      "command.unknown"
-    );
+    const unknownCmdMsg =
+      (await Language.getNode(message.guild?.id, "command.unknown")) +
+      " " +
+      (await Language.getNode(message.guild?.id, "command.maybe"));
     return message.channel.send(unknownCmdMsg.replace("{cmd}", `\`${str}\``));
   }
 }
@@ -74,13 +75,13 @@ async function handleCommand(
   if (command.guildOwnerOnly && message.guild.ownerID !== message.member.id) {
     return message.channel.send(
       Perms.noPermEmoji() +
-        Language.getNode(message.guild.id, ["noperms", "guildOwner"])
+        (await Language.getNode(message.guild.id, ["noperms", "guildOwner"]))
     );
   }
   if (command.botOwnerOnly && !(await Utils.isBotOwner(message.member.id)))
     return message.channel.send(
       Perms.noPermEmoji() +
-        Language.getNode(message.guild.id, ["noperms", "botOwner"])
+        (await Language.getNode(message.guild.id, ["noperms", "botOwner"]))
     );
   if (
     message.guild.me
@@ -89,7 +90,7 @@ async function handleCommand(
   ) {
     return message.channel.send(
       Perms.noPermEmoji() +
-        Language.getNode(message.guild.id, ["noperms", "bot"])
+        (await Language.getNode(message.guild.id, ["noperms", "bot"]))
     );
   }
   if (
@@ -98,8 +99,21 @@ async function handleCommand(
   ) {
     return message.channel.send(
       Perms.noPermEmoji() +
-        Language.getNode(message.guild.id, ["noperms", "general"])
+        (await Language.getNode(message.guild.id, ["noperms", "general"]))
     );
+  }
+  if ("id" in command) {
+    const disabled = await isDisabled(
+      (<any>command).id,
+      message.channel as TextChannel
+    );
+    if (disabled[0]) {
+      return message.channel.send(
+        (
+          await Language.getNode(message.guild?.id, "command.disable.disabled")
+        ).replace(/\{cmd\}/gi, (<any>command).id)
+      );
+    }
   }
   let result: any = {};
   if (command.subcommands) {

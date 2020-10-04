@@ -3,7 +3,6 @@ import mongoose from "mongoose";
 interface Channel extends mongoose.Document {
   _id: string;
   disabledCommands: string[];
-  disabledCommandMessage: string;
   text: {
     [key: string]: {
       commands: {
@@ -29,9 +28,8 @@ export const ChannelData: mongoose.Model<Channel> = mongoose.model(
     {
       _id: String,
       disabledCommands: [String],
-      disabledCommandMessage: String,
       text: {
-        type: Map,
+        type: Object,
         of: {
           commands: {
             enabled: [String],
@@ -44,7 +42,7 @@ export const ChannelData: mongoose.Model<Channel> = mongoose.model(
         },
       },
       voice: {
-        type: Map,
+        type: Object,
         of: {
           Number: String,
         },
