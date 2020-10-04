@@ -24,24 +24,24 @@ export namespace Utils {
   export const getDoc = async (
     id: string,
     collName: DbCollections,
-    cache: number = 0
+    cach: number = 0
   ): Promise<any> => {
     let doc;
     if (
       cache[collName]?.[id] &&
-      cache > 0 &&
-      Date.now() + cache > cache[collName][id][1]
+      cach > 0 &&
+      Date.now() + cach > cache[collName][id][1]
     ) {
       doc = cache[collName][id][0];
     } else {
       const collection = getDb().collection(collName);
       doc = await collection.findOne({ _id: id });
       if (!cache[collName]) cache[collName] = {};
-      if (cache > 50) {
-        cache[collName][id] = [doc, Date.now() + cache];
+      if (cach > 50) {
+        cache[collName][id] = [doc, Date.now() + cach];
         setTimeout(() => {
           delete cache[collName][id];
-        }, cache);
+        }, cach);
       }
     }
     return doc;

@@ -54,7 +54,10 @@ categories:
     description: Game-related commands
   Modules:
     name: Modules
-    description: Commands to manage modules
+		description: Commands to manage modules
+	Staff:
+		name: Staff
+		description: General Staff commands
 help: Help
 name: Name
 usage: Usage
