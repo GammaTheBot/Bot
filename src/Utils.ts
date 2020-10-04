@@ -127,4 +127,13 @@ export namespace Utils {
       String.fromCharCode(parseInt(m.replace(/\\u/g, ""), 16))
     );
   };
+  export const resolvePermissionNumber = (
+    number: number
+  ): Discord.PermissionString[] => {
+    const resolved = [];
+    for (const key of Object.keys(Discord.Permissions.FLAGS)) {
+      if (number & Discord.Permissions.FLAGS[key]) resolved.push(key);
+    }
+    return resolved;
+  };
 }
