@@ -36,7 +36,7 @@ command:
       name: add
     remove:
       name: remove
-  unknown: Command not found! Maybe you meant {cmd}
+  unknown: "Command not found! Maybe you meant {cmd}"
   missing-args: "{command.args} missing!"
   arg: Argument
   args: Arguments

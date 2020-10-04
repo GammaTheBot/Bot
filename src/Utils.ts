@@ -60,6 +60,21 @@ export namespace Utils {
     ).bestMatch;
     return users.find((u) => u.tag === bestMatch.target);
   };
+  export const resolveMember = (
+    text: string,
+    members: Discord.Collection<string, Discord.GuildMember>,
+    impartial?: boolean
+  ): Discord.GuildMember => {
+    text.replace(/<@(.+?)>/gi, "$1");
+    const member =
+      members.get(text) || members.find((u) => u.displayName === text);
+    if (member || !impartial) return member;
+    const bestMatch = stringSimilarity.findBestMatch(
+      text,
+      members.map((u) => u.displayName)
+    ).bestMatch;
+    return members.find((u) => u.displayName === bestMatch.target);
+  };
   export const resolveChannel = (
     text: string,
     channels: Discord.Collection<string, Discord.GuildChannel>,

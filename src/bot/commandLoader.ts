@@ -1,16 +1,19 @@
-import { Message, PermissionResolvable } from "discord.js";
+import {
+  Collection,
+  GuildChannel,
+  Message,
+  PermissionResolvable,
+} from "discord.js";
 import { promises as fs } from "fs";
-import { getOriginalNode } from "typescript";
-import { Type } from "yaml/util";
 import { Language } from "../languages/Language";
 import { BotPermissions } from "../Perms";
+import { Utils } from "../Utils";
 import { bot } from "./bot";
+import schema from "./commands/categories.json";
 
 export const commands: Command[] = [];
 
 export const commandsRunEdit: Command[] = [];
-
-import schema from "./commands/categories.json";
 
 export const categories: {
   [key: string]: {
@@ -38,7 +41,7 @@ async function loadCommands(dir: string): Promise<any> {
   }
 }
 
-export function getUsage(cmd: Command): string {
+export function getUsage(cmd: Command | BaseCommand): string {
   if (!cmd.usage) {
     const usage = [`{${cmd.name}}`];
     if (cmd.args)
@@ -54,9 +57,9 @@ export function getUsage(cmd: Command): string {
 export async function getCommand(
   str: string,
   guildId: string,
-  commands: Command[]
-): Promise<Command> {
-  let command: Command;
+  commands: BaseCommand[]
+): Promise<BaseCommand> {
+  let command: BaseCommand;
   for await (const c of commands) {
     const name = await Language.getNode(guildId, c.name);
     const aliases = await aliasesToString(guildId, c.aliases);
@@ -99,6 +102,8 @@ export enum ArgType { //You can choose different arg type
   number = "number",
   role = "role",
   channel = "channel",
+  user = "user",
+  member = "member",
 }
 
 export interface Arg {
@@ -109,22 +114,25 @@ export interface Arg {
   name: string;
 }
 
-export interface Command {
+export interface BaseCommand {
   name: string;
   usage?: string;
   description?: string;
   aliases?: string | string[];
   dms?: boolean | true;
-  examples?: string | string[];
-  editable?: boolean | true;
-  category?: string;
   botOwnerOnly?: boolean;
   guildOwnerOnly?: boolean;
   clientPermissions?: PermissionResolvable | PermissionResolvable[];
   userPermissions?: BotPermissions | BotPermissions[];
   args?: Arg[];
   exec(message: Message, args?: any): Promise<any> | any | void;
-  subcommands?: Command[];
+  subcommands?: BaseCommand[];
+}
+
+export interface Command extends BaseCommand {
+  examples?: string | string[];
+  editable?: boolean | true;
+  category: string;
 }
 
 export async function aliasesToString(
@@ -132,7 +140,6 @@ export async function aliasesToString(
   aliases: string | string[]
 ): Promise<string[]> {
   if (!aliases) return null;
-  console.log(aliases);
   if (typeof aliases === "string") {
     const alises = await Language.getNode(guildId, aliases);
     return typeof alises === "string" ? [alises] : alises;
@@ -144,7 +151,12 @@ export async function aliasesToString(
   return result;
 }
 
-export function convertType(arg: string, type: ArgType, message: Message) {
+export function convertType(
+  arg: string,
+  type: ArgType,
+  message: Message,
+  impartial?: boolean
+) {
   if (arg?.length < 1) return null;
   switch (type) {
     case "string":
@@ -157,15 +169,28 @@ export function convertType(arg: string, type: ArgType, message: Message) {
       const n = Number(arg);
       return isNaN(n) ? null : n;
     case "channel": {
-      const id = arg.replace(/[<#>]/gi, "");
-      const channel =
-        message.guild.channels.cache.get(id) || bot.channels.cache.get(id);
-      return channel;
+      const channel = Utils.resolveChannel(
+        arg,
+        message.guild.channels.cache,
+        impartial
+      );
+      if (channel) return channel;
+      return Utils.resolveChannel(
+        arg,
+        bot.channels.cache.filter(
+          (c) => c.type !== "dm" && c.type !== "group"
+        ) as Collection<string, GuildChannel>,
+        impartial
+      );
     }
     case "role": {
-      const id = arg.replace(/[<@>]/gi, "");
-      const role = message.guild.roles.cache.get(id);
-      return role;
+      return Utils.resolveRole(arg, message.guild.roles.cache, impartial);
+    }
+    case "user": {
+      return Utils.resolveUser(arg, bot.users.cache, impartial);
+    }
+    case "member": {
+      return Utils.resolveMember(arg, message.guild.members.cache, impartial);
     }
     default:
       return arg;

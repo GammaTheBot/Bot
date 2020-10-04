@@ -2,10 +2,10 @@ import { MessageEmbed, Role } from "discord.js";
 import { Guilds } from "../../../Guilds";
 import { Language } from "../../../languages/Language";
 import { bot } from "../../bot";
-import { ArgType, Command } from "../../commandLoader";
+import { ArgType, BaseCommand, Command } from "../../commandLoader";
 import { getCmdHelp } from "../help";
 
-const PermissionsAdd: Command = {
+const PermissionsAdd: BaseCommand = {
   name: "command.permissions.add.name",
   args: [
     {
@@ -29,6 +29,7 @@ export const Permissions: Command = {
   aliases: "command.permissions.aliases",
   clientPermissions: "SEND_MESSAGES",
   userPermissions: "managePermissions",
+  category: "Modules",
   exec: async (message) => {
     const embed = new MessageEmbed()
       .setAuthor(message.author.tag, message.author.displayAvatarURL())

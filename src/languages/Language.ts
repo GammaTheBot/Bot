@@ -23,6 +23,7 @@ export const Language = {
     guildId: string,
     subnodess: string[] | string
   ): Promise<any> => {
+    console.log("EE");
     try {
       let language =
         (await Utils.getDoc(guildId, "guildData", 1000))?.language ||
@@ -30,7 +31,7 @@ export const Language = {
       let subnodes: string[] = [];
       if (typeof subnodess === "string") subnodes = subnodess.split(".");
       else subnodes = subnodess;
-      subnodess = <string[]>subnodess;
+      console.log(subnodes + "eeeee");
       if (guildId) {
         let txt: any = nodes[language];
         subnodes.forEach((node) => {

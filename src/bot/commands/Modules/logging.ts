@@ -1,4 +1,4 @@
-import { Command } from "../../commandLoader";
+import { BaseCommand, Command } from "../../commandLoader";
 
 const logTypes = {
   emojis: "Emoji creation/deletion/updates",
@@ -10,7 +10,7 @@ const logTypes = {
   nicknames: "Nickname edits",
 };
 
-const LoggingSet: Command = {
+const LoggingSet: BaseCommand = {
   name: "command.logging.set.name",
   clientPermissions: "SEND_MESSAGES",
   exec: (message, args) => {},

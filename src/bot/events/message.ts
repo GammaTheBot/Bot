@@ -9,7 +9,7 @@ import { Utils } from "../../Utils";
 import { bot } from "../bot";
 import {
   Arg,
-  Command,
+	BaseCommand,
   commands,
   commandsRunEdit,
   convertType,
@@ -52,16 +52,16 @@ async function startCommandParsing(message: Message) {
       commands.map((c) => c.name)
     );
     const str = bestMatch.bestMatch.target;
-    return message.channel.send(
-      (
-        await Language.getNode(message.guild?.id, ["command", "unknown"])
-      ).replace("{cmd}", `\`${str}\``)
+    const unknownCmdMsg = await Language.getNode(
+      message.guild?.id,
+      "command.unknown"
     );
+    return message.channel.send(unknownCmdMsg.replace("{cmd}", `\`${str}\``));
   }
 }
 
 async function handleCommand(
-  command: Command,
+  command: BaseCommand,
   message: Message,
   unparsedArgs: string[]
 ) {
