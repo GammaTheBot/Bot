@@ -1,7 +1,7 @@
 import Discord from "discord.js";
+import stringSimilarity from "string-similarity";
 import { bot } from "./bot/bot";
 import { DbCollections, getDb } from "./database/db";
-import stringSimilarity from "string-similarity";
 export namespace Utils {
   export const getPlural = (
     number: number,
@@ -10,6 +10,7 @@ export namespace Utils {
   ): string => {
     return number === 1 ? text : plural;
   };
+
   export const isBotOwner = async (id: string): Promise<boolean> => {
     const app = await bot.fetchApplication();
     const owner = app.owner;
@@ -21,6 +22,7 @@ export namespace Utils {
       [key: string]: [any, number];
     };
   } = {};
+
   export const getDoc = async (
     id: string,
     collName: DbCollections,
@@ -46,6 +48,7 @@ export namespace Utils {
     }
     return doc;
   };
+
   export const resolveUser = (
     text: string,
     users: Discord.Collection<string, Discord.User>,
@@ -61,6 +64,7 @@ export namespace Utils {
     ).bestMatch;
     return users.find((u) => u.tag === bestMatch.target);
   };
+
   export const resolveMember = (
     text: string,
     members: Discord.Collection<string, Discord.GuildMember>,
@@ -77,6 +81,7 @@ export namespace Utils {
     ).bestMatch;
     return members.find((u) => u.displayName === bestMatch.target);
   };
+
   export const resolveChannel = (
     text: string,
     channels: Discord.Collection<string, Discord.GuildChannel>,
@@ -92,6 +97,7 @@ export namespace Utils {
     ).bestMatch;
     return channels.find((u) => u.name === bestMatch.target);
   };
+
   export const resolveRole = (
     text: string,
     roles: Discord.Collection<string, Discord.Role>,
@@ -107,6 +113,7 @@ export namespace Utils {
     ).bestMatch;
     return roles.find((u) => u.name === bestMatch.target);
   };
+
   export const resolveDiscordEmoji = (
     text: string,
     emojis: Discord.Collection<string, Discord.Emoji>,
@@ -122,11 +129,13 @@ export namespace Utils {
     ).bestMatch;
     return emojis.find((u) => u.name === bestMatch.target);
   };
+
   export const resolveUnicodeEmoji = (text: string) => {
     return text.replace(/\\u[\dA-F]{4}/gi, (m) =>
       String.fromCharCode(parseInt(m.replace(/\\u/g, ""), 16))
     );
   };
+
   export const resolvePermissionNumber = (
     number: number
   ): Discord.PermissionString[] => {
