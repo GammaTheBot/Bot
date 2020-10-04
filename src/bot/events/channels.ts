@@ -111,16 +111,10 @@ bot.on("channelUpdate", async (oldChannel, newChannel) => {
       desc.push(
         `**${oldPerms.channel.toString()}**\n` +
           Object.entries(overWriteChange[1]).map((o) => {
-            const newPermissions = new Discord.Permissions(o[1]);
-            return `**${o[0]}:**\n__Old:__ ${new Discord.Permissions(
+            const newPermissions = Utils.resolvePermissionNumber(o[1]);
+            return `**${o[0]}:**\n__Old:__ \`${Utils.resolvePermissionNumber(
               oldPerms[o[0]]
-            )
-              .toArray()
-              .map((e) => `\`${e}\``)
-              .join(`, `)}\n__New:__ ${newPermissions
-              .toArray()
-              .map((e) => `\`${e}\``)
-              .join(`, `)}`;
+            ).join("`, `")}\`\n__New:__ \`${newPermissions.join("`, `")}\``;
           })
       );
     });
