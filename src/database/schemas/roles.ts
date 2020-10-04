@@ -16,7 +16,7 @@ interface Role extends mongoose.Document {
     roleid: string;
   };
   permissions: {
-    id: string[];
+    [key: string]: string[];
   };
 }
 
@@ -41,7 +41,8 @@ export const RoleData: mongoose.Model<Role> = mongoose.model(
       roleid: String,
     },
     permissions: {
-      id: [String],
+      type: Object,
+      of: [String],
     },
   })
 );

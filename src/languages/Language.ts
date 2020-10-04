@@ -25,7 +25,7 @@ export const Language = {
   ): Promise<any> => {
     try {
       let language =
-        (await Utils.getDoc(guildId, "guildData", 1000))?.language ||
+        (await Utils.getDoc(guildId, "guildData", 2000))?.language ||
         Lang.English;
       let subnodes: string[] = [];
       if (typeof subnodess === "string") subnodes = subnodess.split(".");

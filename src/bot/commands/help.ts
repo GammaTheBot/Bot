@@ -130,16 +130,22 @@ export async function getCmdHelp(
           "examples"
         )}:** \`${await aliasesToString(message.guild?.id, cmd.examples)}\``
       );
-  if (cmd.subcommands)
+  if (cmd.subcommands) {
+    const subcmds: string[] = [];
+    for await (const s of cmd.subcommands) {
+      subcmds.push(
+        `• \`${getUsage(s)}\`${
+          s.description
+            ? `\n${await Language.getNode(message.guild?.id, s.description)}`
+            : ""
+        }`
+      );
+    }
     description.push(
       `**${await Language.getNode(message.guild?.id, "subcommands")}:**\n${(
-        await aliasesToString(
-          message.guild?.id,
-          cmd.subcommands.map((s) => {
-            return `• \`${getUsage(s)}\``;
-          })
-        )
+        await aliasesToString(message.guild?.id, subcmds)
       ).join("\n")}`
     );
+  }
   return description.join("\n");
 }

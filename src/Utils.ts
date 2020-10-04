@@ -51,7 +51,8 @@ export namespace Utils {
     users: Discord.Collection<string, Discord.User>,
     impartial?: boolean
   ): Discord.User => {
-    text.replace(/<@(.+?)>/gi, "$1");
+    if (!text) return null;
+    text = text.replace(/<@(.+?)>/gi, "$1");
     const user = users.get(text) || users.find((u) => u.tag === text);
     if (user || !impartial) return user;
     const bestMatch = stringSimilarity.findBestMatch(
@@ -65,7 +66,8 @@ export namespace Utils {
     members: Discord.Collection<string, Discord.GuildMember>,
     impartial?: boolean
   ): Discord.GuildMember => {
-    text.replace(/<@(.+?)>/gi, "$1");
+    if (!text) return null;
+    text = text.replace(/<@(.+?)>/gi, "$1");
     const member =
       members.get(text) || members.find((u) => u.displayName === text);
     if (member || !impartial) return member;
@@ -80,7 +82,8 @@ export namespace Utils {
     channels: Discord.Collection<string, Discord.GuildChannel>,
     impartial?: boolean
   ): Discord.GuildChannel => {
-    text.replace(/<#(.+?)>/gi, "$1");
+    if (!text) return null;
+    text = text.replace(/<#(.+?)>/gi, "$1");
     const channel = channels.get(text) || channels.find((u) => u.name === text);
     if (channel || !impartial) return channel;
     const bestMatch = stringSimilarity.findBestMatch(
@@ -94,7 +97,8 @@ export namespace Utils {
     roles: Discord.Collection<string, Discord.Role>,
     impartial?: boolean
   ): Discord.Role => {
-    text.replace(/<@&(.+?)>/gi, "$1");
+    if (!text) return null;
+    text = text.replace(/<@&(.+?)>/gi, "$1");
     const channel = roles.get(text) || roles.find((u) => u.name === text);
     if (channel || !impartial) return channel;
     const bestMatch = stringSimilarity.findBestMatch(
@@ -108,7 +112,8 @@ export namespace Utils {
     emojis: Discord.Collection<string, Discord.Emoji>,
     impartial?: boolean
   ): Discord.Emoji => {
-    text.replace(/<\w?:?\w+:(\w+?)>/gi, "$1");
+    if (!text) return null;
+    text = text.replace(/<\w?:?\w+:(\w+?)>/gi, "$1");
     const emoji = emojis.get(text) || emojis.find((u) => u.name === text);
     if (emoji || !impartial) return emoji;
     const bestMatch = stringSimilarity.findBestMatch(

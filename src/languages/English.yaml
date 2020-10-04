@@ -32,10 +32,19 @@ command:
     name: permissions
     aliases: ["perms"]
     description: Manage the role permissions
+    examples: ["permissions add @Developer bot administrator"]
     add:
       name: add
+      description: Add permissions to a role
     remove:
       name: remove
+      description: Remove permissions from a role
+    clear:
+      name: clear
+      description: Remove all permissions from a role
+    list:
+      name: list
+      description: List the permissions of a role / all the permissions
   unknown: "Command not found! Maybe you meant {cmd}"
   missing-args: "{command.args} missing!"
   arg: Argument
@@ -54,10 +63,10 @@ categories:
     description: Game-related commands
   Modules:
     name: Modules
-		description: Commands to manage modules
-	Staff:
-		name: Staff
-		description: General Staff commands
+    description: Commands to manage modules
+  Staff:
+    name: Staff
+    description: General Staff commands
 help: Help
 name: Name
 usage: Usage
@@ -66,7 +75,19 @@ category: Category
 examples: Examples
 subcommands: Subcommands
 aliases: Aliases
-permissions: Permissions
+permissions:
+  available: Available permissions
+  name: Permissions
+  nonexistent: That permission doesn't exist!
+  add:
+    success: "Successfully added {perm} to {role}'s permissions"
+    alreadyExists: "{role} already has the {perm} permission!"
+  remove:
+    success: "Successfully removed {perm} from {role}'s permissions!"
+    nonexistent: "{role} doesn't have the {perm} permission!"
+  current: "Current permissions for {role}: {perms}"
+  clear:
+    success: "Successfully cleared {role}'s permissions!"
 perms:
   botAdministrator:
     name: bot administrator

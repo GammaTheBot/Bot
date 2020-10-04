@@ -9,7 +9,7 @@ import { Utils } from "../../Utils";
 import { bot } from "../bot";
 import {
   Arg,
-	BaseCommand,
+  BaseCommand,
   commands,
   commandsRunEdit,
   convertType,
@@ -119,15 +119,13 @@ async function handleCommand(
     result = parseArgs(command.args, unparsedArgs, message);
     if (result.error) {
       const missingArgs: Arg[] = result.missingArgs;
-      const usage = [
-        `${await Language.getNode(message.guild?.id, command.name)} \``,
-      ];
+      const usage = [await Language.getNode(message.guild?.id, command.name)];
       for (const arg of command.args) {
         const t = arg.name || arg.type;
         if (missingArgs.includes(arg)) {
-          usage.push(`**__\`<${t}>\`__**`);
+          usage.push(`**<${t}>**`);
         } else {
-          usage.push(arg.optional ? ` [${t}]` : `<${t}> `);
+          usage.push(arg.optional ? `[${t}]` : `<${t}>`);
         }
       }
       const embed = new Discord.MessageEmbed()
@@ -138,7 +136,7 @@ async function handleCommand(
           `${await Language.parseNodes(
             message.guild?.id,
             "command.missing-args"
-          )}\n\`${prefix}${usage.join("")}`
+          )}\n${usage.join(" ")}`
         );
       return message.channel.send(embed);
     }
@@ -155,8 +153,7 @@ function parseArgs(argss: Arg[], unparsedArgs: string[], message: Message) {
       args.shift();
       unorderedArgs.push(arg);
       continue;
-    }
-    if (arg.match === "everything") {
+    } else if (arg.match === "everything") {
       const casted = convertType(unparsedArgs.join(" "), arg.type, message);
       if (casted != null) {
         args.shift();

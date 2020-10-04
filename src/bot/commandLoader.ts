@@ -31,7 +31,7 @@ async function loadCommands(dir: string): Promise<any> {
       const cmds = await import(`${dir}/${file}`);
       for (const v of Object.values(cmds)) {
         const cmd = <Command>v;
-        if ("exec" in cmd) {
+        if ("category" in cmd) {
           loadCommand(cmd);
         }
       }
