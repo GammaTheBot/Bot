@@ -1,6 +1,7 @@
 import Discord from "discord.js";
 import { all, create } from "mathjs";
 import { Guilds } from "../../../Guilds";
+import { Language } from "../../../languages/Language";
 import { ArgType, Command } from "../../commandLoader";
 
 const math = create(all, {});
@@ -52,7 +53,7 @@ export const Calc: Command = {
       resp = limitedEvaluate(expression);
     } catch (err) {
       return message.channel.send(
-        "Please input a valid expression to calculate!"
+        Language.getNode(message.guild?.id, "command.calc.invalid")
       );
     }
     const embed = new Discord.MessageEmbed()

@@ -14,9 +14,9 @@ export const Ping: Command = {
   exec: async (message) => {
     const msg = await message.channel.send("Pinging...");
     msg.edit(
-      `**Bot Latency:** ${toTimespan(
+      `**Bot:** ${toTimespan(
         msg.createdTimestamp - message.createdTimestamp
-      )}\n**API Latency:** ${toTimespan(bot.ws.ping)}`
+      )}\n**API:** ${toTimespan(bot.ws.ping)}`
     );
   },
 };

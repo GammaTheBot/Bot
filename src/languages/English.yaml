@@ -28,6 +28,7 @@ command:
     name: calc
     description: Calculate a math expression
     aliases: ["calculate", "math", "mathematic", "mathematics", "maths"]
+    invalid: Please input a valid expression to calculate!
   permissions:
     name: permissions
     aliases: ["perms"]
