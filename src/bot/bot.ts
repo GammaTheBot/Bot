@@ -19,6 +19,8 @@ bot.login(process.env.bot_token);
 
 bot.on("ready", async () => {
   console.log("Bot ready! Starting up modules...");
+  console.log("Loading all commands...");
+  await import("./commandManager");
   console.log("Loading all events...");
   const eventFiles = readdirSync(path.join(__dirname, "events"));
   eventFiles.forEach(async (file) => {

@@ -24,7 +24,6 @@ files.forEach((file) => {
       }
     }
     search(json);
-    console.log(nodes);
   }
 });
 
@@ -36,7 +35,8 @@ export namespace Language {
     guildId: string,
     node: string
   ): Promise<string> {
-    const lang = (await GuildData.findById(guildId)).language as Lang;
+    const lang =
+      ((await GuildData.findById(guildId))?.language as Lang) || Lang.English;
     return getNode(lang, node);
   }
   export async function replaceNodesInGuild(

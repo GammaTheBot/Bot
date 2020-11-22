@@ -135,7 +135,7 @@ export function toMs(timespan: string): number {
     console.error(e);
   }
 }
-export function toTimespan(number: number): string {
+export function toTimespan(number: number, ms?: boolean): string {
   try {
     let n: any = {};
     n.centuries = Math.floor(number / 3155760000000);
@@ -152,8 +152,16 @@ export function toTimespan(number: number): string {
     number -= n.hours * 3600000;
     n.minutes = Math.floor(number / 60000);
     number -= n.minutes * 60000;
-    n.seconds = number / 1000;
-    number -= n.seconds * 1000;
+
+    if (ms) {
+      n.seconds = Math.floor(number / 1000);
+      number -= n.seconds * 1000;
+      n.milliseconds = number;
+      number = 0;
+    } else {
+      n.seconds = Math.floor(number / 100) / 10;
+      number = 0;
+    }
     let newidk = (text: string, numb: number) => {
       if (numb == 1) {
         let ne = text.substr(0, text.length - 1);
@@ -165,6 +173,7 @@ export function toTimespan(number: number): string {
     };
     let resp = [];
     for (let key in n) {
+      console.log(key);
       if (newidk(key, n[key])) {
         resp.push(newidk(key, n[key]));
       }

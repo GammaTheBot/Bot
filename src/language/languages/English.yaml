@@ -1,0 +1,31 @@
+command:
+  ping:
+    name: ping
+    description: Get the bot's ping
+    aliases: ["pong"]
+    examples: ["ping"]
+  enable:
+    successGuild: "Successfully enabled {cmd}!"
+    successChannel: "Successfully enabled {cmd} in {channel}!"
+    alreadyEnabled: "{cmd} is already enabled!"
+    name: enable
+    description: Enable a command/module (optionally in a specific channel)
+  disable:
+    disabled: "{cmd} can't be used in this channel!"
+    successGuild: "Successfully disabled {cmd} in this server!"
+    successChannel: "Successfully disabled {cmd} in {channel}!"
+    alreadyDisabled: "{cmd} is already disabled!"
+    name: disable
+    description: Disable a command/module (optionally in a specific channel)
+categories:
+  Utility:
+    name: Utility
+    description: Some useful commands
+commands:
+  unknown: "Command not found!"
+  maybe: "Maybe you meant {cmd}"
+noperms:
+  guildOwner: "Only the server owner can do this!"
+  botOwner: "Only the bot owner can do this!"
+  general: "You don't have enough permissions to do this!"
+  bot: "The bot doesn't have enough permissions to do this!"

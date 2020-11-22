@@ -2,11 +2,9 @@ import { GuildMember } from "discord.js";
 import { RoleData } from "./database/schemas/roles";
 import { Utils } from "./Utils";
 
-export class Perms {
-  static noPermEmoji(): string {
-    return `⛔`;
-  }
-  static async hasPermission(
+export namespace Perms {
+  export const noPermEmoji = `⛔`;
+  export async function hasPermission(
     member: GuildMember,
     perm: BotPermissions | BotPermissions[]
   ): Promise<boolean> {

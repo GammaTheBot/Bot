@@ -5,6 +5,7 @@ import {
   PermissionResolvable,
   TextChannel,
 } from "discord.js";
+import { promises as fs } from "fs";
 import { ChannelData } from "../database/schemas/channels";
 import { toMs } from "../functions";
 import { Language } from "../language/Language";
@@ -117,12 +118,14 @@ export function convertType(
   }
 }
 
-function parseArgs(args: Arg[], argString: string, message: Message) {
+export function parseArgs(
+  args: Arg[],
+  stringArray: string[],
+  message: Message
+) {
   const result: Map<string, any> = new Map();
   const argArray: Set<Arg>[] = [];
-  let stringArray = argString.match(
-    /((?=["'])(?:"(?!\s)[^"\\]*(?:\\[\s\S][^"\\]*)*(?<!\s)")|[^\s]+)/gi
-  );
+
   const missingArgs: Set<string> = new Set();
   for (const [i, arg] of args.entries()) {
     if (!argArray[i]) argArray[i] = new Set();
@@ -184,7 +187,7 @@ function parseArgs(args: Arg[], argString: string, message: Message) {
       }
     }
   }
-  if (missingArgs.size > 0) return result;
+  if (missingArgs.size > 0) return Object.fromEntries(result.entries());
   else return { error: true, ...missingArgs };
 }
 
@@ -239,3 +242,81 @@ export async function getCommand(
   }
   return command;
 }
+
+/*
+ *
+ *
+ *              COMMAND LOADING
+ *
+ *
+ * */
+import schema from "./commands/categories.json";
+
+export const commands: Command[] = [];
+
+export const commandsRunEdit: Command[] = [];
+export const categories: {
+  [key: string]: { description: string; name: string; commands?: Command[] };
+} = schema;
+
+async function loadCommands(dir: string): Promise<any> {
+  const files = await fs.readdir(dir);
+  for await (let file of files) {
+    // Cool ECMAScript feature
+    if (file.endsWith(".ts")) {
+      const cmds = await import(`${dir}/${file}`);
+      for (const v of Object.entries(cmds)) {
+        const cmd = <Command>v[1];
+        if ("category" in cmd) {
+          loadCommand(cmd, v[0]);
+        }
+      }
+    } else if (!file.includes(".")) {
+      await loadCommands(`${dir}/${file}`);
+    }
+  }
+}
+
+export function getUsage(cmd: Command | BaseCommand): string {
+  if (!cmd.usage) {
+    const usage = [`{${cmd.name}}`];
+    if (cmd.args)
+      for (const arg of cmd.args) {
+        const t = arg.name || arg.type;
+        usage.push(arg.optional ? `[${t}]` : `<${t}>`);
+      }
+    return usage.join(" ");
+  }
+  return cmd.usage;
+}
+
+function loadCommand(cmd: Command, id: string) {
+  if (cmd.args)
+    for (const arg of cmd.args) {
+      if (arg.otherPositions && arg.match === "everything") {
+        console.error("An arg can't be unordered and match everything!");
+        return;
+      }
+    }
+  cmd.usage = getUsage(cmd);
+  if (!cmd.id) cmd.id = id;
+  commands.push(cmd);
+  if (cmd.editable) commandsRunEdit.push(cmd);
+  if (!categories[cmd.category]) {
+    console.error(`Category ${cmd.category} not found!`);
+    return;
+  }
+  if (!categories[cmd.category].commands) {
+    categories[cmd.category].commands = [cmd];
+  } else categories[cmd.category].commands.push(cmd);
+}
+
+loadCommands(`${__dirname}/commands/`).then(() => {
+  console.log(
+    `Loaded ${commands.length} ${Utils.getPlural(
+      commands.length,
+      "command",
+      "commands"
+    )}!`
+  );
+});
