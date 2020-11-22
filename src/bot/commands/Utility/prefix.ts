@@ -1,5 +1,6 @@
 import { GuildData } from "../../../database/schemas/guilds";
 import { Guilds } from "../../../Guilds";
+import { Language } from "../../../language/Language";
 import { Perms } from "../../../Perms";
 import { ArgType, Command } from "../../commandManager";
 export const Prefix: Command = {
@@ -26,17 +27,28 @@ export const Prefix: Command = {
             { upsert: true }
           );
           return message.channel.send(
-            `:thumbsup: Successfully set the prefix to  \`\`${prefix}\`\`!`
+            `:thumbsup: ${await Language.getNodeFromGuild(
+              message.guild?.id,
+              "command.prefix.changeSuccess"
+            )} \`\`${prefix}\`\`!`
           );
         } catch (err) {
           console.error(err);
-          return message.channel.send(":x: An error was encountered!");
+          return message.channel.send(
+            `:x: ${await Language.getNodeFromGuild(
+              message.guild?.id,
+              "command.prefix.changeFailure"
+            )}`
+          );
         }
       }
     }
     const currentPrefix = await Guilds.getPrefix(message.guild?.id);
     return message.channel.send(
-      `The bot's prefix is \`\`${currentPrefix}\`\`!`
+      `${await Language.getNodeFromGuild(
+        message.guild?.id,
+        "command.prefix.current"
+      )} \`\`${currentPrefix}\`\`!`
     );
   },
 };

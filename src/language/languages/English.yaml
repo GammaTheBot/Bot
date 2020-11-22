@@ -12,6 +12,9 @@ command:
     name: prefix
     description: Get/set the bot's prefix
     examples: ["prefix", "prefix -"]
+    changeSuccess: "Successfully set the prefix to"
+    changeFailure: "An error was encountered while trying to change the prefix!"
+    current: "The bot's prefix is"
   ping:
     name: ping
     description: Get the bot's ping

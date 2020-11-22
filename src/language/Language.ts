@@ -27,6 +27,8 @@ files.forEach((file) => {
   }
 });
 
+const languageCache: Map<string, Lang> = new Map();
+
 export namespace Language {
   export function getNode(language: Lang, node: string): string {
     return nodes?.get(language)?.get(node);
@@ -35,8 +37,16 @@ export namespace Language {
     guildId: string,
     node: string
   ): Promise<string> {
-    const lang =
-      ((await GuildData.findById(guildId))?.language as Lang) || Lang.English;
+    let lang: Lang;
+    if (languageCache.has(guildId)) lang = languageCache.get(guildId);
+    else {
+      lang =
+        ((await GuildData.findById(guildId))?.language as Lang) || Lang.English;
+      languageCache.set(guildId, lang);
+      setTimeout(() => {
+        languageCache.delete(guildId);
+      }, 15000);
+    }
     return getNode(lang, node);
   }
   export async function replaceNodesInGuild(
