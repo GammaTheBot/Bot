@@ -51,12 +51,12 @@ export namespace Language {
     if (text != null) {
       for (let i = 0; i < text.length; i++) {
         if (text.charAt(i) === "{") {
-          const start = i;
-          if (text.charAt(i++) === "@") {
+          const start = ++i;
+          if (text.charAt(i) === "@") {
             while (text.charAt(i) !== "}") i++;
             const placeholder = text.substring(start + 1, i);
             text = text.replace(
-              `{${placeholder}}`,
+              `{@${placeholder}}`,
               await Language.getNodeFromGuild(guildId, placeholder)
             );
           }
@@ -71,13 +71,15 @@ export namespace Language {
   ): Promise<string> {
     for (let i = 0; i < text.length; i++) {
       if (text.charAt(i) === "{") {
-        const start = i;
-        while (text.charAt(i) !== "}") i++;
-        const placeholder = text.substring(start + 1, i);
-        text = text.replace(
-          `{${placeholder}}`,
-          await Language.getNodeFromGuild(guildId, placeholder)
-        );
+        const start = ++i;
+        if (text.charAt(i) === "@") {
+          while (text.charAt(i) !== "}") i++;
+          const placeholder = text.substring(start + 1, i);
+          text = text.replace(
+            `{@${placeholder}}`,
+            await Language.getNodeFromGuild(guildId, placeholder)
+          );
+        }
       }
     }
     return text;

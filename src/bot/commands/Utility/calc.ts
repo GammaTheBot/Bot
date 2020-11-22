@@ -37,7 +37,7 @@ export const Calc: Command = {
   name: "command.calc.name",
   aliases: "command.calc.aliases",
   description: "command.calc.description",
-  examples: ["{command.calc.name} 1+1", "{command.calc.name} 100*5"],
+  examples: ["{@command.calc.name} 1+1", "{@command.calc.name} 100*5"],
   editable: true,
   args: [
     {

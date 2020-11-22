@@ -12,6 +12,14 @@ import { Language } from "../language/Language";
 import { BotPermissions } from "../Perms";
 import { Utils } from "../Utils";
 import { bot } from "./bot";
+/*
+ *
+ *
+ *              COMMAND LOADING
+ *
+ *
+ * */
+import schema from "./commands/categories.json";
 
 export interface BaseCommand {
   name: string;
@@ -64,7 +72,7 @@ export function convertType(
   message: Message,
   impartial?: boolean
 ) {
-  if (arg?.length < 1) return null;
+  if (arg?.length < 1 || arg == null) return null;
   switch (type) {
     case "string":
       return arg;
@@ -244,15 +252,6 @@ export async function getCommand(
   return command;
 }
 
-/*
- *
- *
- *              COMMAND LOADING
- *
- *
- * */
-import schema from "./commands/categories.json";
-
 export const commands: Command[] = [];
 
 export const commandsRunEdit: Command[] = [];
@@ -278,9 +277,9 @@ async function loadCommands(dir: string): Promise<any> {
   }
 }
 
-export function getUsage(cmd: Command | BaseCommand): string {
+export function getCommandUsage(cmd: Command | BaseCommand): string {
   if (!cmd.usage) {
-    const usage = [`{${cmd.name}}`];
+    const usage = [`{@${cmd.name}}`];
     if (cmd.args)
       for (const arg of cmd.args) {
         const t = arg.name || arg.type;
@@ -292,7 +291,7 @@ export function getUsage(cmd: Command | BaseCommand): string {
 }
 
 function loadCommand(cmd: Command, id: string) {
-  cmd.usage = getUsage(cmd);
+  cmd.usage = getCommandUsage(cmd);
   if (!cmd.id) cmd.id = id;
   commands.push(cmd);
   if (cmd.editable) commandsRunEdit.push(cmd);

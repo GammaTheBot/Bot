@@ -11,7 +11,7 @@ export var Eval: Command = {
   aliases: "command.eval.aliases",
   clientPermissions: [],
   botOwnerOnly: true,
-  examples: ["{command.eval.name} true"],
+  examples: ["{@command.eval.name} true"],
   args: [
     {
       type: ArgType.string,

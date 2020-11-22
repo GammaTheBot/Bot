@@ -66,6 +66,9 @@ categories:
   Utility:
     name: Utility
     description: Some useful commands
+  Staff:
+    name: Staff
+    description: Staff commands
 commands:
   unknown: "Command not found!"
   maybe: "Maybe you meant {cmd}"
@@ -77,3 +80,11 @@ noperms:
   botOwner: "Only the bot owner can do this!"
   general: "You don't have enough permissions to do this!"
   bot: "The bot doesn't have enough permissions to do this!"
+help: Help
+name: Name
+usage: Usage
+description: Description
+category: Category
+examples: Examples
+subcommands: Subcommands
+aliases: Aliases
