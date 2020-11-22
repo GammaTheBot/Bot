@@ -47,7 +47,23 @@ export namespace Language {
         languageCache.delete(guildId);
       }, 15000);
     }
-    return getNode(lang, node);
+    let text = getNode(lang, node);
+    if (text != null) {
+      for (let i = 0; i < text.length; i++) {
+        if (text.charAt(i) === "{") {
+          const start = i;
+          if (text.charAt(i++) === "@") {
+            while (text.charAt(i) !== "}") i++;
+            const placeholder = text.substring(start + 1, i);
+            text = text.replace(
+              `{${placeholder}}`,
+              await Language.getNodeFromGuild(guildId, placeholder)
+            );
+          }
+        }
+      }
+    }
+    return text;
   }
   export async function replaceNodesInGuild(
     guildId: string,

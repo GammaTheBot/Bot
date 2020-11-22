@@ -156,16 +156,19 @@ async function handleCommand(
       return;
     }
   }
-  let result;
+  let result:
+    | { error: true; missingArgs: Set<string> }
+    | { [key: string]: any };
   if (command.args) {
     result = parseArgs(command.args, unparsedArgs, message);
-    if (result.error) {
+    if (result.error === true) {
+      const failed = result as { error: true; missingArgs: Set<string> };
       const usage = [
         await Language.getNodeFromGuild(message.guild?.id, command.name),
       ];
       for (const arg of command.args) {
         const t = arg.name || arg.type;
-        if (result?.missingArgs?.includes(arg)) {
+        if (failed?.missingArgs?.has(arg.name)) {
           usage.push(`**<${t}>**`);
         } else {
           usage.push(arg.optional ? `[${t}]` : `<${t}>`);

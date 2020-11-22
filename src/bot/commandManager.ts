@@ -122,7 +122,7 @@ export function parseArgs(
   args: Arg[],
   stringArray: string[],
   message: Message
-) {
+): { [key: string]: any } | { error: true; missingArgs: Set<string> } {
   const result: Map<string, any> = new Map();
   const argArray: Set<Arg>[] = [];
 
@@ -203,7 +203,8 @@ export async function isCommandDisabled(
   if (doc?.text?.[channel.id]?.commands?.disabled)
     disabledChannelCmds.push(doc?.text?.[channel.id]?.commands?.disabled);
   const enabledCmds = doc?.text?.[channel.id]?.commands?.enabled;
-  if (enabledCmds?.includes(thing)) return [false, null];
+  if (enabledCmds?.includes(thing))
+    return [false, disabledGuildCmds?.includes(thing) ? "guild" : null];
   if (disabledChannelCmds?.includes(thing)) return [true, "channel"];
   else if (disabledGuildCmds?.includes(thing)) return [true, "guild"];
   else return [false, null];
@@ -268,7 +269,7 @@ async function loadCommands(dir: string): Promise<any> {
       for (const v of Object.entries(cmds)) {
         const cmd = <Command>v[1];
         if ("category" in cmd) {
-          loadCommand(cmd, v[0]);
+          loadCommand(cmd, v[0].toLowerCase());
         }
       }
     } else if (!file.includes(".")) {

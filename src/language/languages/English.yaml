@@ -49,6 +49,19 @@ command:
     list:
       name: list
       description: List the permissions of a role / all the permissions
+  enable:
+    successGuild: "Successfully enabled {cmd}!"
+    successChannel: "Successfully enabled {cmd} in {channel}!"
+    alreadyEnabled: "{cmd} is already enabled!"
+    name: enable
+    description: Enable a command/module (optionally in a specific channel)
+  disable:
+    disabled: "{cmd} can't be used in this channel!"
+    successGuild: "Successfully disabled {cmd}!"
+    successChannel: "Successfully disabled {cmd} in {channel}!"
+    alreadyDisabled: "{cmd} is already disabled!"
+    name: disable
+    description: Disable a command/module (optionally in a specific channel)
 categories:
   Utility:
     name: Utility
@@ -56,7 +69,7 @@ categories:
 commands:
   unknown: "Command not found!"
   maybe: "Maybe you meant {cmd}"
-  missing-args: "{command.args} missing!"
+  missing-args: "{@commands.args} missing!"
   arg: Argument
   args: Arguments
 noperms:

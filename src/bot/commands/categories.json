@@ -2,5 +2,9 @@
   "Utility": {
     "name": "⚒️ {categories.Utility.name}",
     "description": "{categories.Utility.description}"
+  },
+	  "Staff": {
+    "description": "{categories.Staff.description}",
+    "name": "🛠️ {categories.Staff.name}"
   }
 }
