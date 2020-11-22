@@ -173,7 +173,6 @@ export function toTimespan(number: number, ms?: boolean): string {
     };
     let resp = [];
     for (let key in n) {
-      console.log(key);
       if (newidk(key, n[key])) {
         resp.push(newidk(key, n[key]));
       }

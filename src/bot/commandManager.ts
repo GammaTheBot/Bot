@@ -137,7 +137,7 @@ export function parseArgs(
   }
   const remainingEverythings: Arg[] = [];
   function convertEverything(arg: Arg, stringArray: string[]): boolean {
-    const converted = convertType(stringArray.join(" "), arg.type, message);
+    const converted = convertType(stringArray?.join(" "), arg.type, message);
     if (converted != null) {
       if (!result.has(arg.name)) result.set(arg.name, converted);
       else result.set(arg.name, result.get(arg.name) + ` ${converted}`);
@@ -158,17 +158,17 @@ export function parseArgs(
         }
         continue;
       }
-      for (const [ind, str] of stringArray.entries()) {
+      for (const [ind, str] of stringArray?.entries() || [""].entries()) {
         const converted = convertType(str, arg.type, message);
         if (converted != null) {
-          stringArray.splice(ind, 1);
+          stringArray?.splice(ind, 1);
           if (!result.has(arg.name)) result.set(arg.name, converted);
           else result.set(arg.name, result.get(arg.name) + ` ${converted}`);
           if (missingArgs.has(arg.name)) missingArgs.delete(arg.name);
           if (remainingEverythings.length > 0) {
             const result = convertEverything(
               remainingEverythings.shift(),
-              stringArray.slice(0, ind)
+              stringArray?.slice(0, ind)
             );
             if (result) break currentArg;
           }
@@ -187,8 +187,8 @@ export function parseArgs(
       }
     }
   }
-  if (missingArgs.size > 0) return Object.fromEntries(result.entries());
-  else return { error: true, ...missingArgs };
+  if (missingArgs.size < 1) return Object.fromEntries(result.entries());
+  else return { error: true, missingArgs: missingArgs };
 }
 
 export async function isCommandDisabled(
@@ -291,13 +291,6 @@ export function getUsage(cmd: Command | BaseCommand): string {
 }
 
 function loadCommand(cmd: Command, id: string) {
-  if (cmd.args)
-    for (const arg of cmd.args) {
-      if (arg.otherPositions && arg.match === "everything") {
-        console.error("An arg can't be unordered and match everything!");
-        return;
-      }
-    }
   cmd.usage = getUsage(cmd);
   if (!cmd.id) cmd.id = id;
   commands.push(cmd);

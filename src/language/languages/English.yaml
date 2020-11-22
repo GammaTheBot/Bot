@@ -1,22 +1,51 @@
 command:
+  eval:
+    description: Evaluates code
+    name: eval
+    aliases: ["evaluate"]
+  help:
+    description: Lists and describes the commands the bot contains
+    name: "help"
+    examples: ["help", "help prefix"]
+    info: My prefix is `{prefix}`. You can also mention the bot as the prefix! For example `{mention} help` or `{prefix}help`. Execute `{prefix}help <command>` to find information on specific commands!
+  prefix:
+    name: prefix
+    description: Get/set the bot's prefix
+    examples: ["prefix", "prefix -"]
   ping:
     name: ping
     description: Get the bot's ping
     aliases: ["pong"]
     examples: ["ping"]
-  enable:
-    successGuild: "Successfully enabled {cmd}!"
-    successChannel: "Successfully enabled {cmd} in {channel}!"
-    alreadyEnabled: "{cmd} is already enabled!"
-    name: enable
-    description: Enable a command/module (optionally in a specific channel)
-  disable:
-    disabled: "{cmd} can't be used in this channel!"
-    successGuild: "Successfully disabled {cmd} in this server!"
-    successChannel: "Successfully disabled {cmd} in {channel}!"
-    alreadyDisabled: "{cmd} is already disabled!"
-    name: disable
-    description: Disable a command/module (optionally in a specific channel)
+  logging:
+    name: logging
+    aliases: ["logs"]
+    examples: logging enable <module>
+    description: Manage the logging settings
+    set:
+      name: set
+  calc:
+    name: calc
+    description: Calculate a math expression
+    aliases: ["calculate", "math", "mathematic", "mathematics", "maths"]
+    invalid: Please input a valid expression to calculate!
+  permissions:
+    name: permissions
+    aliases: ["perms"]
+    description: Manage the role permissions
+    examples: ["permissions add @Developer bot administrator"]
+    add:
+      name: add
+      description: Add permissions to a role
+    remove:
+      name: remove
+      description: Remove permissions from a role
+    clear:
+      name: clear
+      description: Remove all permissions from a role
+    list:
+      name: list
+      description: List the permissions of a role / all the permissions
 categories:
   Utility:
     name: Utility
@@ -24,6 +53,9 @@ categories:
 commands:
   unknown: "Command not found!"
   maybe: "Maybe you meant {cmd}"
+  missing-args: "{command.args} missing!"
+  arg: Argument
+  args: Arguments
 noperms:
   guildOwner: "Only the server owner can do this!"
   botOwner: "Only the bot owner can do this!"

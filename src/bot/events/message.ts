@@ -83,24 +83,26 @@ async function handleCommand(
     const guildData = await GuildData.findById(message.guild?.id);
     prefix = guildData?.prefix || config.bot.prefix;
   } else if (command.dms) prefix = config.bot.prefix;
-  else
-    return message.channel.send(
-      ":x: This command can't be used in direct messages!"
-    );
+  else {
+    message.channel.send(":x: This command can't be used in direct messages!");
+    return;
+  }
   if (
     command.guildOwnerOnly &&
     (message.guild.ownerID !== message.author.id || command.dms)
   ) {
-    return message.channel.send(
+    message.channel.send(
       Perms.noPermEmoji +
         Language.getNodeFromGuild(message.guild?.id, "noperms.guildOwner")
     );
+    return;
   }
   if (command.botOwnerOnly && !(await Utils.isBotOwner(message.author.id))) {
-    return message.channel.send(
+    message.channel.send(
       Perms.noPermEmoji +
         Language.getNodeFromGuild(message.guild?.id, "noperms.botOwner")
     );
+    return;
   }
   if (message.channel.type !== "dm") {
     if (
@@ -108,27 +110,29 @@ async function handleCommand(
         .permissionsIn(message.channel)
         .missing(new Discord.Permissions(command.clientPermissions)).length > 0
     ) {
-      return message.channel.send(
+      message.channel.send(
         Perms.noPermEmoji +
           (await Language.getNodeFromGuild(message.guild.id, "noperms.bot"))
       );
+      return;
     }
     if (
       command.userPermissions &&
       !(await Perms.hasPermission(message.member, command.userPermissions))
     ) {
-      return message.channel.send(
+      message.channel.send(
         Perms.noPermEmoji +
           (await Language.getNodeFromGuild(message.guild.id, "noperms.general"))
       );
+      return;
     }
     if ("id" in command) {
       const disabled = await isCommandDisabled(
         (<any>command).id,
         message.channel as TextChannel
       );
-      if (disabled[0])
-        return message.channel.send(
+      if (disabled[0]) {
+        message.channel.send(
           (
             await Language.getNodeFromGuild(
               message.guild?.id,
@@ -136,6 +140,8 @@ async function handleCommand(
             )
           ).replace(/\{cmd\}/, (<any>command).id)
         );
+        return;
+      }
     }
   }
   if (command.subcommands) {
@@ -146,20 +152,20 @@ async function handleCommand(
         command.subcommands
       );
       if (subCommand)
-        return await handleCommand(subCommand, message, unparsedArgs.slice(1));
+        await handleCommand(subCommand, message, unparsedArgs.slice(1));
+      return;
     }
   }
-  let result: { [key: string]: any };
+  let result;
   if (command.args) {
     result = parseArgs(command.args, unparsedArgs, message);
     if (result.error) {
-      const missingArgs: Arg[] = result.missingArgs;
       const usage = [
         await Language.getNodeFromGuild(message.guild?.id, command.name),
       ];
       for (const arg of command.args) {
         const t = arg.name || arg.type;
-        if (missingArgs.includes(arg)) {
+        if (result?.missingArgs?.includes(arg)) {
           usage.push(`**<${t}>**`);
         } else {
           usage.push(arg.optional ? `[${t}]` : `<${t}>`);
@@ -172,12 +178,15 @@ async function handleCommand(
         .setDescription(
           `${await Language.getNodeFromGuild(
             message.guild?.id,
-            "command.missing-args"
+            "commands.missing-args"
           )}\n${usage.join(" ")}`
         );
-      return message.channel.send(embed);
+      message.channel.send(embed);
+      return;
     }
     command.exec(message, result);
+    return;
   }
-  command.exec(message);
+  command.exec(message, {});
+  return;
 }
