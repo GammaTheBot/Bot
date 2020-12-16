@@ -1,21 +1,21 @@
 import Discord, { Message, TextChannel } from "discord.js";
-import { GuildData } from "../../database/schemas/guilds";
-import { bot } from "../bot";
-import {
-  getCommand,
-  commands,
-  parseArgs,
-  BaseCommand,
-  isCommandDisabled,
-  Arg,
-  commandsRunEdit,
-} from "../commandManager";
-import config from "../config.json";
+import _ from "lodash";
 import stringSimilarity from "string-similarity";
+import { GuildData } from "../../database/schemas/guilds";
+import { Guilds } from "../../Guilds";
 import { Language } from "../../language/Language";
 import { Perms } from "../../Perms";
 import { Utils } from "../../Utils";
-import { Guilds } from "../../Guilds";
+import { bot } from "../bot";
+import {
+  BaseCommand,
+  commands,
+  commandsRunEdit,
+  getCommand,
+  isCommandDisabled,
+  parseArgs,
+} from "../commandManager";
+import config from "../config.json";
 
 bot.on("messageUpdate", async (oldMessage, newMessage) => {
   if (commandsRunEdit.length > 0) {
@@ -63,7 +63,9 @@ async function startCommandParsing(message: Message) {
     const bestMatch = stringSimilarity.findBestMatch(cmd, translatedCommands);
     const str = bestMatch.bestMatch.target;
     const unknownCmdMsg =
-      (await Language.getNodeFromGuild(message.guild?.id, "commands.unknown")) +
+      _.upperFirst(
+        await Language.getNodeFromGuild(message.guild?.id, "commands.unknown")
+      ) +
       " " +
       (await Language.getNodeFromGuild(message.guild?.id, "commands.maybe"));
     return message.channel.send(unknownCmdMsg.replace("{cmd}", `\`${str}\``));

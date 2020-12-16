@@ -14,9 +14,17 @@ const bot = new Discord.Client({
       name: "starting up",
     },
   },
+  ws: {
+    compress: true,
+    properties: {
+      $device: "Gamma",
+      $os: "The Gamma Bot OS",
+      $browser: "discord.js",
+    },
+  },
 });
 bot.login(process.env.bot_token);
-
+bot.on("debug", console.info);
 bot.on("ready", async () => {
   console.log("Bot ready! Starting up modules...");
   console.log("Loading all commands...");

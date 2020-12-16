@@ -54,23 +54,25 @@ command:
     successChannel: "Successfully enabled {cmd} in {channel}!"
     alreadyEnabled: "{cmd} is already enabled!"
     name: enable
-    description: Enable a command/module (optionally in a specific channel)
+    description: Enable a {@commands.command}}/module (optionally in a specific channel)
   disable:
     disabled: "{cmd} can't be used in this channel!"
     successGuild: "Successfully disabled {cmd}!"
     successChannel: "Successfully disabled {cmd} in {channel}!"
     alreadyDisabled: "{cmd} is already disabled!"
     name: disable
-    description: Disable a command/module (optionally in a specific channel)
+    description: Disable a {@commands.command}/module (optionally in a specific channel)
 categories:
   Utility:
     name: Utility
-    description: Some useful commands
+    description: "Some useful {@commands.commands}"
   Staff:
     name: Staff
-    description: Staff commands
+    description: "Staff {@commands.commands}"
 commands:
-  unknown: "Command not found!"
+  commands: commands
+  command: command
+  unknown: "{@commands.command} not found!"
   maybe: "Maybe you meant {cmd}"
   missing-args: "{@commands.args} missing!"
   arg: Argument

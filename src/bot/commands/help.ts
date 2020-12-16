@@ -1,4 +1,6 @@
 import { Message, MessageEmbed, TextChannel } from "discord.js";
+import _ from "lodash";
+import stringSimilarity from "string-similarity";
 import { Guilds } from "../../Guilds";
 import { Language } from "../../language/Language";
 import { bot } from "../bot";
@@ -9,9 +11,8 @@ import {
   categories,
   Command,
   commands,
-  getCommand,
-  isCommandDisabled,
   getCommandUsage,
+  isCommandDisabled,
 } from "../commandManager";
 
 export const Help: Command = {
@@ -75,7 +76,76 @@ export const Help: Command = {
       }
       return message.channel.send(embed);
     }
-    const cmd = await getCommand(command, message.guild?.id, commands);
+    let cat: {
+      description: string;
+      name: string;
+      commands?: Command[];
+    };
+    let translatedName: string;
+    for await (const c of Object.values(categories)) {
+      const name = `${await Language.replaceNodesInGuild(
+        message.guild?.id,
+        c.name
+      )}`
+        ?.split(" ")
+        ?.slice(1)
+        ?.join(" ");
+      if (name.toLowerCase() === command.toLowerCase()) {
+        cat = c;
+        translatedName = name;
+        break;
+      }
+    }
+    if (cat) {
+      const embed = new MessageEmbed()
+        .setAuthor(message.author.tag, message.author.displayAvatarURL())
+        .setTimestamp()
+        .setColor(await Guilds.getColor(message.guild?.id))
+        .setTitle(
+          bot.user.username +
+            " " +
+            (await Language.replaceNodesInGuild(message.guild?.id, "help"))
+        );
+      const cmds = [];
+      for await (const cmd of cat.commands) {
+        cmds.push(
+          `\`\`${await Language.getNodeFromGuild(
+            message.guild?.id,
+            cmd.name
+          )}\`\`: ${await Language.getNodeFromGuild(
+            message.guild?.id,
+            cmd.description
+          )}`
+        );
+      }
+      const translatedDesc = await Language.replaceNodesInGuild(
+        message.guild?.id,
+        cat.description
+      );
+      embed.setDescription(
+        `**__${_.startCase(
+          translatedName
+        )}__:**\n${translatedDesc}\n\n${_.upperFirst(
+          await Language.getNodeFromGuild(
+            message.guild?.id,
+            "commands.commands"
+          )
+        )}:\n` + cmds.join("\n")
+      );
+      return message.channel.send(embed);
+    }
+    let cmd: Command;
+    let cmdList: string[] = [];
+    for await (const c of commands) {
+      const name = await Language.getNodeFromGuild(message.guild?.id, c.name);
+      const aliases = await aliasesToString(message.guild?.id, c.aliases);
+      cmdList.push(name);
+      const result = name === command || aliases?.includes(command);
+      if (result === true) {
+        cmd = c;
+        break;
+      }
+    }
     if (cmd) {
       const embed = new MessageEmbed()
         .setAuthor(message.author.tag, message.author.displayAvatarURL())
@@ -90,8 +160,18 @@ export const Help: Command = {
       message.channel.send(embed);
       return;
     }
+    let possibleCmd = stringSimilarity.findBestMatch(command, cmdList);
     message.channel.send(
-      await Language.getNodeFromGuild(message.guild.id, "commands.unknown")
+      _.upperFirst(
+        (await Language.getNodeFromGuild(
+          message.guild.id,
+          "commands.unknown"
+        )) +
+          "\n" +
+          (
+            await Language.getNodeFromGuild(message.guild.id, "commands.maybe")
+          ).replace(/\{cmd\}/gi, "``" + possibleCmd.bestMatch.target + "``")
+      )
     );
     return;
   },
