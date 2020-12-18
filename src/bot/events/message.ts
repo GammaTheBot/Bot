@@ -91,18 +91,23 @@ async function handleCommand(
   }
   if (
     command.guildOwnerOnly &&
-    (message.guild.ownerID !== message.author.id || command.dms)
+    ((message.guild.ownerID !== message.author.id &&
+      !(await Utils.isBotOwner(message.author.id))) ||
+      command.dms)
   ) {
     message.channel.send(
       Perms.noPermEmoji +
-        Language.getNodeFromGuild(message.guild?.id, "noperms.guildOwner")
+        (await Language.getNodeFromGuild(
+          message.guild?.id,
+          "noperms.guildOwner"
+        ))
     );
     return;
   }
   if (command.botOwnerOnly && !(await Utils.isBotOwner(message.author.id))) {
     message.channel.send(
       Perms.noPermEmoji +
-        Language.getNodeFromGuild(message.guild?.id, "noperms.botOwner")
+        (await Language.getNodeFromGuild(message.guild?.id, "noperms.botOwner"))
     );
     return;
   }
@@ -124,6 +129,7 @@ async function handleCommand(
     ) {
       message.channel.send(
         Perms.noPermEmoji +
+          " " +
           (await Language.getNodeFromGuild(message.guild.id, "noperms.general"))
       );
       return;

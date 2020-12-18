@@ -12,9 +12,13 @@ command:
     name: prefix
     description: Get/set the bot's prefix
     examples: ["prefix", "prefix -"]
-    changeSuccess: "Successfully set the prefix to"
+    changeSuccess: "Successfully set the prefix to {prefix}"
     changeFailure: "An error was encountered while trying to change the prefix!"
-    current: "The bot's prefix is"
+    current: "The bot's prefix is {prefix}"
+  downloaddata:
+    name: downloaddata
+    aliases: ["download-data"]
+    description: Download the guild's data
   ping:
     name: ping
     description: Get the bot's ping
@@ -69,6 +73,8 @@ categories:
   Staff:
     name: Staff
     description: "Staff {@commands.commands}"
+dms:
+  closed-message: "Your direct messages are closed! I can't send you anything!"
 commands:
   commands: commands
   command: command

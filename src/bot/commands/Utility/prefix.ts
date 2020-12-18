@@ -27,10 +27,12 @@ export const Prefix: Command = {
             { upsert: true }
           );
           return message.channel.send(
-            `:thumbsup: ${await Language.getNodeFromGuild(
-              message.guild?.id,
-              "command.prefix.changeSuccess"
-            )} \`\`${prefix}\`\`!`
+            `:thumbsup: ${(
+              await Language.getNodeFromGuild(
+                message.guild?.id,
+                "command.prefix.changeSuccess"
+              )
+            ).replace(/\{prefix\}/gi, `\`\`${prefix}\`\``)}!`
           );
         } catch (err) {
           console.error(err);
@@ -45,10 +47,12 @@ export const Prefix: Command = {
     }
     const currentPrefix = await Guilds.getPrefix(message.guild?.id);
     return message.channel.send(
-      `${await Language.getNodeFromGuild(
-        message.guild?.id,
-        "command.prefix.current"
-      )} \`\`${currentPrefix}\`\`!`
+      `${(
+        await Language.getNodeFromGuild(
+          message.guild?.id,
+          "command.prefix.current"
+        )
+      ).replace(/\{prefix\}/gi, `\`\`${currentPrefix}\`\``)}`
     );
   },
 };
