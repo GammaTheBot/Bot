@@ -47,16 +47,13 @@ export const Calc: Command = {
     },
   ],
   dms: true,
-  exec: async (message, { expression }: { expression: string }) => {
+  exec: async (message, { expression }: { expression: string }, language) => {
     let resp: any;
     try {
       resp = limitedEvaluate(expression);
     } catch (err) {
       return message.channel.send(
-        await Language.getNodeFromGuild(
-          message.guild?.id,
-          "command.calc.invalid"
-        )
+        Language.getNode(language, "command.calc.invalid")
       );
     }
     const embed = new Discord.MessageEmbed()

@@ -17,7 +17,7 @@ export const Prefix: Command = {
     },
   ],
   description: "command.prefix.description",
-  exec: async (message, { prefix }: { prefix: string }) => {
+  exec: async (message, { prefix }: { prefix: string }, language) => {
     if (prefix) {
       if (await Perms.hasPermission(message.member, "botAdministrator")) {
         try {
@@ -27,32 +27,26 @@ export const Prefix: Command = {
             { upsert: true }
           );
           return message.channel.send(
-            `:thumbsup: ${(
-              await Language.getNodeFromGuild(
-                message.guild?.id,
-                "command.prefix.changeSuccess"
-              )
-            ).replace(/\{prefix\}/gi, `\`\`${prefix}\`\``)}!`
+            `:thumbsup: ${(Language.getNode(
+              language,
+              "command.prefix.changeSuccess"
+            ) as string).replace(/\{prefix\}/gi, `\`\`${prefix}\`\``)}!`
           );
         } catch (err) {
           console.error(err);
           return message.channel.send(
-            `:x: ${await Language.getNodeFromGuild(
-              message.guild?.id,
-              "command.prefix.changeFailure"
-            )}`
+            `:x: ${Language.getNode(language, "command.prefix.changeFailure")}`
           );
         }
       }
     }
     const currentPrefix = await Guilds.getPrefix(message.guild?.id);
-    return message.channel.send(
-      `${(
-        await Language.getNodeFromGuild(
-          message.guild?.id,
-          "command.prefix.current"
-        )
-      ).replace(/\{prefix\}/gi, `\`\`${currentPrefix}\`\``)}`
+    await message.channel.send(
+      `${(Language.getNode(
+        language,
+        "command.prefix.current"
+      ) as string).replace(/\{prefix\}/gi, `\`\`${currentPrefix}\`\``)}`
     );
+    return;
   },
 };

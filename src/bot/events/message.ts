@@ -1,9 +1,9 @@
-import Discord, { Message, TextChannel } from "discord.js";
+import Discord, { DataResolver, Message, TextChannel } from "discord.js";
 import _ from "lodash";
 import stringSimilarity from "string-similarity";
 import { GuildData } from "../../database/schemas/guilds";
 import { Guilds } from "../../Guilds";
-import { Language } from "../../language/Language";
+import { Lang, Language } from "../../language/Language";
 import { Perms } from "../../Perms";
 import { Utils } from "../../Utils";
 import { bot } from "../bot";
@@ -31,9 +31,11 @@ bot.on("message", async (message) => {
 async function startCommandParsing(message: Message) {
   if (message.author.bot) return;
   let prefix: string;
+  let language: Lang;
   if (message.channel.type !== "dm") {
     const guildData = await GuildData.findById(message.guild?.id);
     prefix = guildData?.prefix || config.bot.prefix;
+    language = Lang[guildData?.language] || Lang.English;
   } else prefix = config.bot.prefix;
   let cmd: string;
   let unparsedArgs: string[] = [];
@@ -51,23 +53,19 @@ async function startCommandParsing(message: Message) {
     }
   }
   if (cmd == null) return;
-  let command = await getCommand(cmd, message.guild?.id, commands);
-  if (command) handleCommand(command, message, unparsedArgs);
+  let command = getCommand(cmd, language, commands);
+  if (command) handleCommand(command, message, unparsedArgs, language);
   else {
     const translatedCommands: string[] = [];
-    for await (const c of commands) {
-      translatedCommands.push(
-        await Language.getNodeFromGuild(message.guild?.id, c.name)
-      );
+    for (const c of commands) {
+      translatedCommands.push(Language.getNode(language, c.name) as string);
     }
     const bestMatch = stringSimilarity.findBestMatch(cmd, translatedCommands);
     const str = bestMatch.bestMatch.target;
     const unknownCmdMsg =
-      _.upperFirst(
-        await Language.getNodeFromGuild(message.guild?.id, "commands.unknown")
-      ) +
+      _.upperFirst(Language.getNode(language, "commands.unknown") as string) +
       " " +
-      (await Language.getNodeFromGuild(message.guild?.id, "commands.maybe"));
+      Language.getNode(language, "commands.maybe");
     return message.channel.send(unknownCmdMsg.replace("{cmd}", `\`${str}\``));
   }
 }
@@ -75,39 +73,31 @@ async function startCommandParsing(message: Message) {
 async function handleCommand(
   command: BaseCommand,
   message: Message,
-  unparsedArgs: string[]
+  unparsedArgs: string[],
+  language: Lang
 ) {
   unparsedArgs = unparsedArgs
     .join(" ")
     .match(/((?=["'])(?:"(?!\s)[^"\\]*(?:\\[\s\S][^"\\]*)*(?<!\s)")|[^\s]+)/gi);
-  let prefix: string;
-  if (message.channel.type !== "dm") {
-    const guildData = await GuildData.findById(message.guild?.id);
-    prefix = guildData?.prefix || config.bot.prefix;
-  } else if (command.dms) prefix = config.bot.prefix;
-  else {
-    message.channel.send(":x: This command can't be used in direct messages!");
-    return;
-  }
-  if (
-    command.guildOwnerOnly &&
-    ((message.guild.ownerID !== message.author.id &&
-      !(await Utils.isBotOwner(message.author.id))) ||
-      command.dms)
-  ) {
+  if (message.channel.type === "dm" && !command.dms) {
     message.channel.send(
-      Perms.noPermEmoji +
-        (await Language.getNodeFromGuild(
-          message.guild?.id,
-          "noperms.guildOwner"
-        ))
+      Language.parseInnerNodes(language, ":x: {@commands.dms-disabled}")
     );
     return;
   }
-  if (command.botOwnerOnly && !(await Utils.isBotOwner(message.author.id))) {
+  const isBotOwner = await Utils.isBotOwner(message.author.id);
+  if (
+    command.guildOwnerOnly &&
+    (message.guild.ownerID !== message.author.id || !isBotOwner)
+  ) {
     message.channel.send(
-      Perms.noPermEmoji +
-        (await Language.getNodeFromGuild(message.guild?.id, "noperms.botOwner"))
+      Perms.noPermEmoji + Language.getNode(language, "noperms.guildOwner")
+    );
+    return;
+  }
+  if (command.botOwnerOnly && !isBotOwner) {
+    message.channel.send(
+      Perms.noPermEmoji + Language.getNode(language, "noperms.botOwner")
     );
     return;
   }
@@ -118,8 +108,7 @@ async function handleCommand(
         .missing(new Discord.Permissions(command.clientPermissions)).length > 0
     ) {
       message.channel.send(
-        Perms.noPermEmoji +
-          (await Language.getNodeFromGuild(message.guild.id, "noperms.bot"))
+        Perms.noPermEmoji + Language.getNode(language, "noperms.bot")
       );
       return;
     }
@@ -128,9 +117,7 @@ async function handleCommand(
       !(await Perms.hasPermission(message.member, command.userPermissions))
     ) {
       message.channel.send(
-        Perms.noPermEmoji +
-          " " +
-          (await Language.getNodeFromGuild(message.guild.id, "noperms.general"))
+        Perms.noPermEmoji + " " + Language.getNode(language, "noperms.general")
       );
       return;
     }
@@ -141,12 +128,10 @@ async function handleCommand(
       );
       if (disabled[0]) {
         message.channel.send(
-          (
-            await Language.getNodeFromGuild(
-              message.guild?.id,
-              "command.disable.disabled"
-            )
-          ).replace(/\{cmd\}/, (<any>command).id)
+          (Language.getNode(
+            language,
+            "command.disable.disabled"
+          ) as string).replace(/\{cmd\}/, (<any>command).id)
         );
         return;
       }
@@ -154,13 +139,18 @@ async function handleCommand(
   }
   if (command.subcommands) {
     if (unparsedArgs && unparsedArgs.length > 0) {
-      const subCommand = await getCommand(
+      const subCommand = getCommand(
         unparsedArgs[0],
-        message.guild?.id,
+        language,
         command.subcommands
       );
       if (subCommand)
-        await handleCommand(subCommand, message, unparsedArgs.slice(1));
+        await handleCommand(
+          subCommand,
+          message,
+          unparsedArgs.slice(1),
+          language
+        );
       return;
     }
   }
@@ -169,11 +159,9 @@ async function handleCommand(
     | { [key: string]: any };
   if (command.args) {
     result = parseArgs(command.args, unparsedArgs, message);
-    if (result.error === true) {
+    if (result.error) {
       const failed = result as { error: true; missingArgs: Set<string> };
-      const usage = [
-        await Language.getNodeFromGuild(message.guild?.id, command.name),
-      ];
+      const usage = [Language.getNode(language, command.name)];
       for (const arg of command.args) {
         const t = arg.name || arg.type;
         if (failed?.missingArgs?.has(arg.name)) {
@@ -187,17 +175,17 @@ async function handleCommand(
         .setTimestamp()
         .setAuthor(message.author.tag, message.author.displayAvatarURL())
         .setDescription(
-          `${await Language.getNodeFromGuild(
-            message.guild?.id,
-            "commands.missing-args"
-          )}\n${usage.join(" ")}`
+          `${Language.getNode(language, "commands.missing-args")}\n${usage.join(
+            " "
+          )}`
         );
       message.channel.send(embed);
       return;
+    } else {
+      command.exec(message, result, language);
+      return;
     }
-    command.exec(message, result);
-    return;
   }
-  command.exec(message, {});
+  command.exec(message, {}, language);
   return;
 }

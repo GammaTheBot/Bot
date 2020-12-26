@@ -26,27 +26,26 @@ export const Disable: Command = {
   userPermissions: "botAdministrator",
   exec: async (
     message,
-    { command, channel }: { command: string; channel: Discord.GuildChannel }
+    { command, channel }: { command: string; channel: Discord.GuildChannel },
+    language
   ) => {
     const cmdsByLang: { [key: string]: string } = {};
     for await (const cmd of commands) {
       cmdsByLang[
-        await Language.getNodeFromGuild(message.guild.id, cmd.name)
+        Language.getNode(language, cmd.name) as string
       ] = cmd.id.toLowerCase();
     }
     for await (const category of Object.entries(schema)) {
       cmdsByLang[
-        (
-          await Language.replaceNodesInGuild(
-            message.guild.id,
-            category[1].name.replace(/^.*?(\{.*?\}).*?$/gi, "$1")
-          )
-        ).toLowerCase()
+        (Language.parseInnerNodes(
+          language,
+          category[1].name.replace(/^.*?(\{.*?\}).*?$/gi, "$1")
+        ) as string).toLowerCase()
       ] = category[0].toLowerCase();
     }
     if (!cmdsByLang[command])
       return message.channel.send(
-        await Language.getNodeFromGuild(message.guild.id, "command.unknown")
+        Language.getNode(language, "command.unknown")
       );
     let disabled = await isCommandDisabled(
       command,
@@ -55,12 +54,10 @@ export const Disable: Command = {
     if (channel) {
       if (!disabled[0]) {
         return message.channel.send(
-          (
-            await Language.getNodeFromGuild(
-              message.guild.id,
-              "command.enable.alreadyEnabled"
-            )
-          ).replace(/\{cmd\}/gi, command)
+          (Language.getNode(
+            language,
+            "command.enable.alreadyEnabled"
+          ) as string).replace(/\{cmd\}/gi, command)
         );
       }
       if (disabled[1] === "guild") {
@@ -94,7 +91,7 @@ export const Disable: Command = {
       ? "command.enable.successChannel"
       : "command.enable.successGuild";
     return message.channel.send(
-      (await Language.getNodeFromGuild(message.guild.id, node))
+      (Language.getNode(language, node) as string)
         .replace(/\{cmd\}/gi, command)
         .replace(/\{channel\}/gi, channel?.toString())
     );

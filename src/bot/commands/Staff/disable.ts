@@ -26,27 +26,26 @@ export const Disable: Command = {
   userPermissions: "botAdministrator",
   exec: async (
     message,
-    { command, channel }: { command: string; channel: Discord.GuildChannel }
+    { command, channel }: { command: string; channel: Discord.GuildChannel },
+    language
   ) => {
     const cmdsByLang: { [key: string]: string } = {};
     for await (const cmd of commands) {
       cmdsByLang[
-        await Language.getNodeFromGuild(message.guild.id, cmd.name)
+        Language.getNode(language, cmd.name) as string
       ] = cmd.id.toLowerCase();
     }
     for await (const category of Object.entries(schema)) {
       cmdsByLang[
-        (
-          await Language.replaceNodesInGuild(
-            message.guild.id,
-            category[1].name.replace(/^.*?(\{.*?\}).*?$/gi, "$1")
-          )
-        ).toLowerCase()
+        (Language.parseInnerNodes(
+          language,
+          category[1].name.replace(/^.*?(\{.*?\}).*?$/gi, "$1")
+        ) as string).toLowerCase()
       ] = category[0].toLowerCase();
     }
     if (!cmdsByLang[command])
       return message.channel.send(
-        await Language.getNodeFromGuild(message.guild.id, "command.unknown")
+        Language.getNode(language, "command.unknown")
       );
     let disabled = await isCommandDisabled(
       command,
@@ -54,12 +53,10 @@ export const Disable: Command = {
     );
     if (disabled[0]) {
       return message.channel.send(
-        (
-          await Language.getNodeFromGuild(
-            message.guild.id,
-            "command.disable.alreadyDisabled"
-          )
-        ).replace(/\{cmd\}/gi, command)
+        (Language.getNode(
+          language,
+          "command.disable.alreadyDisabled"
+        ) as string).replace(/\{cmd\}/gi, command)
       );
     }
     if (channel) {
@@ -85,7 +82,7 @@ export const Disable: Command = {
     const node = channel
       ? "command.disable.successChannel"
       : "command.disable.successGuild";
-    const result = await Language.getNodeFromGuild(message.guild.id, node);
+    const result = Language.getNode(language, node) as string;
     return message.channel.send(
       result
         .replace(/\{cmd\}/gi, command)

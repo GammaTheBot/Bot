@@ -8,7 +8,7 @@ import {
 import { promises as fs } from "fs";
 import { ChannelData } from "../database/schemas/channels";
 import { toMs } from "../functions";
-import { Language } from "../language/Language";
+import { Lang, Language } from "../language/Language";
 import { BotPermissions } from "../Perms";
 import { Utils } from "../Utils";
 import { bot } from "./bot";
@@ -32,7 +32,11 @@ export interface BaseCommand {
   clientPermissions?: PermissionResolvable | PermissionResolvable[];
   userPermissions?: BotPermissions | BotPermissions[];
   args?: Arg[];
-  exec(message: Message, args?: any): Promise<any> | any | void;
+  exec(
+    message: Message,
+    args?: any,
+    language?: Lang
+  ): Promise<any> | any | void;
   subcommands?: BaseCommand[];
 }
 
@@ -218,31 +222,31 @@ export async function isCommandDisabled(
   else return [false, null];
 }
 
-export async function aliasesToString(
-  guildId: string,
+export function aliasesToString(
+  language: Lang,
   aliases: string | string[]
-): Promise<string[]> {
+): string[] {
   if (!aliases) return null;
   if (typeof aliases === "string") {
-    const alises = await Language.getNodeFromGuild(guildId, aliases);
+    const alises = Language.getNode(language, aliases);
     return typeof alises === "string" ? [alises] : alises;
   }
   const result = [];
   for (const alias of aliases) {
-    result.push(await Language.replaceNodesInGuild(guildId, alias));
+    result.push(Language.getNode(language, alias));
   }
   return result;
 }
 
-export async function getCommand(
+export function getCommand(
   str: string,
-  guildId: string,
+  language: Lang,
   commands: BaseCommand[]
-): Promise<BaseCommand> {
+): BaseCommand {
   let command: BaseCommand;
-  for await (const c of commands) {
-    const name = await Language.getNodeFromGuild(guildId, c.name);
-    const aliases = await aliasesToString(guildId, c.aliases);
+  for (const c of commands) {
+    const name = Language.getNode(language, c.name);
+    const aliases = aliasesToString(language, c.aliases);
     const result = name === str || aliases?.includes(str);
     if (result === true) {
       command = c;

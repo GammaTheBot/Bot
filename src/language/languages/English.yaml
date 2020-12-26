@@ -4,10 +4,30 @@ command:
     name: eval
     aliases: ["evaluate"]
   help:
-    description: Lists and describes the commands the bot contains
+    description: Lists and describes the {@commands.commands} the bot contains
     name: "help"
     examples: ["help", "help prefix"]
-    info: My prefix is `{prefix}`. You can also mention the bot as the prefix! For example `{mention} help` or `{prefix}help`. Execute `{prefix}help <command>` to find information on specific commands!
+    info: My prefix is `{prefix}`. You can also mention the bot as the prefix! For example `{mention} help` or `{prefix}help`. Execute `{prefix}help <{@commands.command}>` to find information on specific {@commands.commands}!
+  permissions:
+    name: permissions
+    aliases: ["perms", "perm", "permission"]
+    description: "Manage role permissions"
+    usage: "<add/remove/clear/list> <ROLE> <PERMISSION>"
+    examples: ["perms add @Developer botAdministrator"]
+    no-specific-perms: "{role} has no specific permissions!"
+    list-perms: "{role} has these permissions: {perms}"
+    add:
+      name: add
+      description: Add permissions to a role
+    remove:
+      name: remove
+      description: Remove permissions from a role
+    clear:
+      name: clear
+      description: Remove all permissions from a role
+    list:
+      name: list
+      description: List the permissions of a role / all the permissions
   prefix:
     name: prefix
     description: Get/set the bot's prefix
@@ -36,23 +56,6 @@ command:
     description: Calculate a math expression
     aliases: ["calculate", "math", "mathematic", "mathematics", "maths"]
     invalid: Please input a valid expression to calculate!
-  permissions:
-    name: permissions
-    aliases: ["perms"]
-    description: Manage the role permissions
-    examples: ["permissions add @Developer bot administrator"]
-    add:
-      name: add
-      description: Add permissions to a role
-    remove:
-      name: remove
-      description: Remove permissions from a role
-    clear:
-      name: clear
-      description: Remove all permissions from a role
-    list:
-      name: list
-      description: List the permissions of a role / all the permissions
   enable:
     successGuild: "Successfully enabled {cmd}!"
     successChannel: "Successfully enabled {cmd} in {channel}!"
@@ -66,6 +69,26 @@ command:
     alreadyDisabled: "{cmd} is already disabled!"
     name: disable
     description: Disable a {@commands.command}/module (optionally in a specific channel)
+permissions:
+  botAdministrator: bot administrator
+  kick: "kick"
+  mute: "mute"
+  ban: "ban"
+  bypassFilter: "bypass filter"
+  dj: dj
+  punishments: "punishments"
+  clearChat: "clear chat"
+  counting: "manage counting"
+  logging: "manage logging"
+  loginFlow: "manage login flow"
+  suggestions: "manage suggestions"
+  customCommands: "manage custom commands"
+  starboard: "manage starboard"
+  roles: "manage roles"
+  experience: "manage experience"
+  managePermissions: "manage permissions"
+  embeds: "manage embeds"
+
 categories:
   Utility:
     name: Utility
@@ -78,6 +101,7 @@ dms:
 commands:
   commands: commands
   command: command
+  dms-disabled: "That {@commands.command} can't be used in direct messages!"
   unknown: "{@commands.command} not found!"
   maybe: "Maybe you meant {cmd}"
   missing-args: "{@commands.args} missing!"

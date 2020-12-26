@@ -12,7 +12,7 @@ export const DownloadData: Command = {
   category: "Staff",
   guildOwnerOnly: true,
   dms: false,
-  exec: async (message) => {
+  exec: async (message, _args, language) => {
     const collections = Object.values(db().collections);
     const json = {};
     for await (let collection of collections) {
@@ -35,13 +35,8 @@ export const DownloadData: Command = {
     try {
       await channel.send(attachment);
     } catch (err) {
-      console.log(err);
       return message.channel.send(
-        ":x: " +
-          (await Language.getNodeFromGuild(
-            message.guild?.id,
-            "dms.closed-message"
-          ))
+        ":x: " + Language.getNode(language, "dms.closed-message")
       );
     }
   },

@@ -32,11 +32,10 @@ export type BotPermissions =
   | "kick"
   | "mute"
   | "ban"
-  | "bypassFilter"
-  | "musicManager"
+  | "bypassChatFilter"
   | "dj"
   | "punishments"
-  | "clear"
+  | "clearChat"
   | "counting"
   | "logging"
   | "loginFlow"
@@ -47,25 +46,3 @@ export type BotPermissions =
   | "experience"
   | "managePermissions"
   | "embeds";
-
-export const botPermissions = {
-  botAdministrator: "Access to all the features",
-  kick: "Access to the kick command",
-  mute: "Access to the mute and unmute commands",
-  ban: "Access to the ban and unban commands",
-  bypassFilter: "Bypass the chat filter",
-  musicManager: "Manage the music settings",
-  dj: "Bypass the music threshold",
-  punishments: "Access to the case and punishments commands",
-  clear: "Clear messages",
-  counting: "Manage the counting settings",
-  logging: "Manage logging settings",
-  loginFlow: "Manage the login flow",
-  suggestions: "Manage the suggestions system",
-  customCommands: "Manage custom commands",
-  starboard: "Manage the starboard system",
-  roles: "Manage the assigning roles system",
-  experience: "Manage the chat experience system",
-  managePermissions: "Access to the permissions command",
-  embeds: "Create embeds",
-};

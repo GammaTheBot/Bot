@@ -1,8 +1,9 @@
 import { Message, MessageEmbed, TextChannel } from "discord.js";
 import _ from "lodash";
 import stringSimilarity from "string-similarity";
+import { LanguageService } from "typescript";
 import { Guilds } from "../../Guilds";
-import { Language } from "../../language/Language";
+import { Lang, Language } from "../../language/Language";
 import { bot } from "../bot";
 import {
   aliasesToString,
@@ -29,32 +30,24 @@ export const Help: Command = {
     },
   ],
   clientPermissions: ["SEND_MESSAGES", "USE_EXTERNAL_EMOJIS"],
-  exec: async (message, { command }: { command: string }) => {
+  exec: async (message, { command }: { command: string }, language) => {
     if (!command) {
       const embed = new MessageEmbed()
         .setAuthor(message.author.tag, message.author.displayAvatarURL())
         .setTimestamp()
         .setColor(await Guilds.getColor(message.guild?.id))
         .setTitle(
-          bot.user.username +
-            " " +
-            (await Language.replaceNodesInGuild(message.guild.id, "help"))
+          bot.user.username + " " + Language.parseInnerNodes(language, "help")
         );
       embed.setDescription(
-        `${await Language.getNodeFromGuild(
-          message.guild?.id,
-          "command.help.info"
-        )}\n`
+        `${Language.getNode(language, "command.help.info")}\n`
           .replace(/\{prefix\}/gi, await Guilds.getPrefix(message.guild?.id))
           .replace(/\{mention\}/gi, "@" + bot.user.username)
       );
       for await (const category of Object.values(categories)) {
-        const name = `${await Language.replaceNodesInGuild(
-          message.guild?.id,
-          category.name
-        )}`;
-        let stuff = `${await Language.replaceNodesInGuild(
-          message.guild?.id,
+        const name = `${Language.parseInnerNodes(language, category.name)}`;
+        let stuff = `${Language.parseInnerNodes(
+          language,
           category.description
         )}`;
         const cmds: string[] = [];
@@ -66,7 +59,7 @@ export const Help: Command = {
               )[0]
                 ? "🔒`"
                 : "`") +
-                (await Language.getNodeFromGuild(message.guild?.id, cmd.name)) +
+                Language.getNode(language, cmd.name) +
                 "`"
             );
           }
@@ -83,10 +76,7 @@ export const Help: Command = {
     };
     let translatedName: string;
     for await (const c of Object.values(categories)) {
-      const name = `${await Language.replaceNodesInGuild(
-        message.guild?.id,
-        c.name
-      )}`
+      const name = `${Language.parseInnerNodes(language, c.name)}`
         ?.split(" ")
         ?.slice(1)
         ?.join(" ");
@@ -102,34 +92,26 @@ export const Help: Command = {
         .setTimestamp()
         .setColor(await Guilds.getColor(message.guild?.id))
         .setTitle(
-          bot.user.username +
-            " " +
-            (await Language.replaceNodesInGuild(message.guild?.id, "help"))
+          bot.user.username + " " + Language.parseInnerNodes(language, "help")
         );
       const cmds = [];
       for await (const cmd of cat.commands) {
         cmds.push(
-          `\`\`${await Language.getNodeFromGuild(
-            message.guild?.id,
-            cmd.name
-          )}\`\`: ${await Language.getNodeFromGuild(
-            message.guild?.id,
+          `\`\`${Language.getNode(language, cmd.name)}\`\`: ${Language.getNode(
+            language,
             cmd.description
           )}`
         );
       }
-      const translatedDesc = await Language.replaceNodesInGuild(
-        message.guild?.id,
+      const translatedDesc = Language.parseInnerNodes(
+        language,
         cat.description
       );
       embed.setDescription(
         `**__${_.startCase(
           translatedName
         )}__:**\n${translatedDesc}\n\n${_.upperFirst(
-          await Language.getNodeFromGuild(
-            message.guild?.id,
-            "commands.commands"
-          )
+          Language.getNode(language, "commands.commands") as string
         )}:\n` + cmds.join("\n")
       );
       return message.channel.send(embed);
@@ -137,8 +119,8 @@ export const Help: Command = {
     let cmd: Command;
     let cmdList: string[] = [];
     for await (const c of commands) {
-      const name = await Language.getNodeFromGuild(message.guild?.id, c.name);
-      const aliases = await aliasesToString(message.guild?.id, c.aliases);
+      const name = Language.getNode(language, c.name) as string;
+      const aliases = aliasesToString(language, c.aliases);
       cmdList.push(name);
       const result = name === command || aliases?.includes(command);
       if (result === true) {
@@ -152,25 +134,21 @@ export const Help: Command = {
         .setTimestamp()
         .setColor(await Guilds.getColor(message.guild?.id))
         .setTitle(
-          bot.user.username +
-            " " +
-            (await Language.replaceNodesInGuild(message.guild?.id, "help"))
+          bot.user.username + " " + Language.parseInnerNodes(language, "help")
         );
-      embed.setDescription(await getCmdHelp(cmd, message));
+      embed.setDescription(await getCmdHelp(cmd, message, language));
       message.channel.send(embed);
       return;
     }
     let possibleCmd = stringSimilarity.findBestMatch(command, cmdList);
     message.channel.send(
       _.upperFirst(
-        (await Language.getNodeFromGuild(
-          message.guild.id,
-          "commands.unknown"
-        )) +
+        Language.getNode(language, "commands.unknown") +
           "\n" +
-          (
-            await Language.getNodeFromGuild(message.guild.id, "commands.maybe")
-          ).replace(/\{cmd\}/gi, "``" + possibleCmd.bestMatch.target + "``")
+          (Language.getNode(language, "commands.maybe") as string).replace(
+            /\{cmd\}/gi,
+            "``" + possibleCmd.bestMatch.target + "``"
+          )
       )
     );
     return;
@@ -179,78 +157,65 @@ export const Help: Command = {
 
 export async function getCmdHelp(
   cmd: BaseCommand | Command,
-  message: Message
+  message: Message,
+  lang: Lang
 ): Promise<string> {
   let description = [
-    `**${await Language.getNodeFromGuild(
-      message.guild?.id,
-      "name"
-    )}:** ${await Language.getNodeFromGuild(message.guild?.id, cmd.name)}`,
+    `**${Language.getNode(lang, "name")}:** ${Language.getNode(
+      lang,
+      cmd.name
+    )}`,
   ];
   if (cmd.description)
     description.push(
-      `**${await Language.getNodeFromGuild(
-        message.guild?.id,
-        "description"
-      )}:** ${await Language.getNodeFromGuild(
-        message.guild?.id,
+      `**${Language.getNode(lang, "description")}:** ${Language.getNode(
+        lang,
         cmd.description
       )}`
     );
   if (cmd.usage)
     description.push(
-      `**${await Language.getNodeFromGuild(
-        message.guild?.id,
-        "usage"
-      )}:** ${await Language.replaceNodesInGuild(message.guild?.id, cmd.usage)}`
+      `**${Language.getNode(lang, "usage")}:** ${Language.parseInnerNodes(
+        lang,
+        cmd.usage
+      )}`
     );
-  if (cmd.aliases)
+  if (cmd.aliases) {
+    const aliases = aliasesToString(lang, cmd.aliases);
     description.push(
-      `**${await Language.getNodeFromGuild(
-        message.guild?.id,
-        "aliases"
-      )}:** \`${(await aliasesToString(message.guild?.id, cmd.aliases)).join(
-        "`, `"
-      )}\``
+      `**${Language.getNode(lang, "aliases")}:** \`${aliases.join("`, `")}\``
     );
+  }
   if ("category" in cmd)
     if (cmd.category)
       description.push(
-        `**${await Language.getNodeFromGuild(
-          message.guild?.id,
-          "category"
-        )}:** ${await Language.replaceNodesInGuild(
-          message.guild?.id,
+        `**${Language.getNode(lang, "category")}:** ${Language.parseInnerNodes(
+          lang,
           categories[cmd.category].name
         )}`
       );
   if ("examples" in cmd)
     if (cmd.examples)
       description.push(
-        `**${await Language.getNodeFromGuild(
-          message.guild?.id,
-          "examples"
-        )}:** \`${await aliasesToString(message.guild?.id, cmd.examples)}\``
+        `**${Language.getNode(lang, "examples")}:** \`${aliasesToString(
+          lang,
+          cmd.examples
+        )}\``
       );
   if (cmd.subcommands) {
     const subcmds: string[] = [];
     for await (const s of cmd.subcommands) {
       subcmds.push(
         `• \`${getCommandUsage(s)}\`${
-          s.description
-            ? `\n${await Language.getNodeFromGuild(
-                message.guild?.id,
-                s.description
-              )}`
-            : ""
+          s.description ? `\n${Language.getNode(lang, s.description)}` : ""
         }`
       );
     }
     description.push(
-      `**${await Language.getNodeFromGuild(
-        message.guild?.id,
-        "subcommands"
-      )}:**\n${(await aliasesToString(message.guild?.id, subcmds)).join("\n")}`
+      `**${Language.getNode(lang, "subcommands")}:**\n${aliasesToString(
+        lang,
+        subcmds
+      ).join("\n")}`
     );
   }
   return description.join("\n");
