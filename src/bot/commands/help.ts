@@ -92,7 +92,11 @@ export const Help: Command = {
         .setTimestamp()
         .setColor(await Guilds.getColor(message.guild?.id))
         .setTitle(
-          bot.user.username + " " + Language.parseInnerNodes(language, "help")
+          bot.user.username +
+            " " +
+            Language.parseInnerNodes(language, "help") +
+            " | " +
+            _.startCase(translatedName)
         );
       const cmds = [];
       for await (const cmd of cat.commands) {
@@ -108,11 +112,9 @@ export const Help: Command = {
         cat.description
       );
       embed.setDescription(
-        `**__${_.startCase(
-          translatedName
-        )}__:**\n${translatedDesc}\n\n${_.upperFirst(
+        `${translatedDesc}\n\n**${_.upperFirst(
           Language.getNode(language, "commands.commands") as string
-        )}:\n` + cmds.join("\n")
+        )}:**\n` + cmds.join("\n")
       );
       return message.channel.send(embed);
     }
@@ -202,7 +204,7 @@ export async function getCmdHelp(
           cmd.examples
         )}\``
       );
-  if (cmd.subcommands) {
+  if (cmd.subcommands && cmd.subcommands?.length > 0) {
     const subcmds: string[] = [];
     for await (const s of cmd.subcommands) {
       subcmds.push(
@@ -211,6 +213,7 @@ export async function getCmdHelp(
         }`
       );
     }
+    console.log(subcmds);
     description.push(
       `**${Language.getNode(lang, "subcommands")}:**\n${aliasesToString(
         lang,

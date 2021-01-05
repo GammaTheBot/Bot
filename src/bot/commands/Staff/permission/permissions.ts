@@ -6,6 +6,7 @@ import { Utils } from "../../../../Utils";
 import { bot } from "../../../bot";
 import { ArgType, Command } from "../../../commandManager";
 import { getCmdHelp } from "../../help";
+import { ListPermissions } from "./listPermission";
 
 export const Permission: Command = {
   name: "command.permissions.name",
@@ -36,11 +37,16 @@ export const Permission: Command = {
       const permissions = (await RoleData.findById(message.guild?.id))
         ?.permissions[role.id];
       if (!permissions)
-        message.channel.send(
+        return message.channel.send(
           (Language.getNode(
             language,
             "command.permissions.no-specific-perms"
-          ) as string).replace(/\{role\}/gi, role.toString())
+          ) as string).replace(/\{role\}/gi, role.toString()),
+          {
+            allowedMentions: {
+              parse: [],
+            },
+          }
         );
       else {
         const embed = new MessageEmbed()
@@ -61,5 +67,5 @@ export const Permission: Command = {
       }
     }
   },
-  subcommands: [],
+  subcommands: [ListPermissions],
 };

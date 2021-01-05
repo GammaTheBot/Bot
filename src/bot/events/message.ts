@@ -145,13 +145,12 @@ async function handleCommand(
         command.subcommands
       );
       if (subCommand)
-        await handleCommand(
+        return await handleCommand(
           subCommand,
           message,
           unparsedArgs.slice(1),
           language
         );
-      return;
     }
   }
   let result:

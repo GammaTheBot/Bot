@@ -233,7 +233,7 @@ export function aliasesToString(
   }
   const result = [];
   for (const alias of aliases) {
-    result.push(Language.getNode(language, alias));
+    result.push(Language.parseInnerNodes(language, alias));
   }
   return result;
 }
@@ -266,7 +266,6 @@ export const categories: {
 async function loadCommands(dir: string): Promise<any> {
   const files = await fs.readdir(dir);
   for await (let file of files) {
-    // Cool ECMAScript feature
     if (file.endsWith(".ts")) {
       const cmds = await import(`${dir}/${file}`);
       for (const v of Object.entries(cmds)) {
