@@ -15,10 +15,8 @@ const bot = new Discord.Client({
     },
   },
   ws: {
-    compress: true,
     properties: {
       $device: "Gamma",
-      $os: "The Gamma Bot OS",
       $browser: "discord.js",
     },
   },

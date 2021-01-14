@@ -32,7 +32,7 @@ export const Disable: Command = {
     const cmdsByLang: { [key: string]: string } = {};
     for await (const cmd of commands) {
       cmdsByLang[
-        Language.getNode(language, cmd.name) as string
+        Language.getNode<string>(language, cmd.name)
       ] = cmd.id.toLowerCase();
     }
     for await (const category of Object.entries(schema)) {
@@ -54,10 +54,10 @@ export const Disable: Command = {
     if (channel) {
       if (!disabled[0]) {
         return message.channel.send(
-          (Language.getNode(
+          Language.getNode<string>(
             language,
             "command.enable.alreadyEnabled"
-          ) as string).replace(/\{cmd\}/gi, command)
+          ).replace(/\{cmd\}/gi, command)
         );
       }
       if (disabled[1] === "guild") {
@@ -91,7 +91,7 @@ export const Disable: Command = {
       ? "command.enable.successChannel"
       : "command.enable.successGuild";
     return message.channel.send(
-      (Language.getNode(language, node) as string)
+      Language.getNode<string>(language, node)
         .replace(/\{cmd\}/gi, command)
         .replace(/\{channel\}/gi, channel?.toString())
     );

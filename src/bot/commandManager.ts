@@ -228,12 +228,12 @@ export function aliasesToString(
 ): string[] {
   if (!aliases) return null;
   if (typeof aliases === "string") {
-    const alises = Language.getNode(language, aliases);
+    const alises = Language.getNode<string|string[]>(language, aliases);
     return typeof alises === "string" ? [alises] : alises;
   }
   const result = [];
   for (const alias of aliases) {
-    result.push(Language.parseInnerNodes(language, alias));
+    result.push(Language.parseInnerNodes<string|string[]>(language, alias));
   }
   return result;
 }

@@ -19,10 +19,10 @@ export const ListPermissions: BaseCommand = {
       ?.permissions[role.id];
     if (!permissions)
       return message.channel.send(
-        (Language.getNode(
+        Language.getNode<string>(
           language,
           "command.permissions.no-specific-perms"
-        ) as string).replace(/\{role\}/gi, role.toString()),
+        ).replace(/\{role\}/gi, role.toString()),
         {
           allowedMentions: {
             parse: [],
@@ -34,10 +34,7 @@ export const ListPermissions: BaseCommand = {
         .setColor(await Guilds.getColor(message.guild?.id))
         .setAuthor(message.author.tag, message.author.displayAvatarURL())
         .setDescription(
-          (Language.getNode(
-            language,
-            "command.permissions.list-perms"
-          ) as string)
+          Language.getNode<string>(language, "command.permissions.list-perms")
             .replace(/\{role\}/gi, role.toString())
             .replace(
               /\{permissions\}/gi,

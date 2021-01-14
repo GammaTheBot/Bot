@@ -32,7 +32,7 @@ export const Disable: Command = {
     const cmdsByLang: { [key: string]: string } = {};
     for await (const cmd of commands) {
       cmdsByLang[
-        Language.getNode(language, cmd.name) as string
+        Language.getNode<string>(language, cmd.name)
       ] = cmd.id.toLowerCase();
     }
     for await (const category of Object.entries(schema)) {
@@ -82,7 +82,7 @@ export const Disable: Command = {
     const node = channel
       ? "command.disable.successChannel"
       : "command.disable.successGuild";
-    const result = Language.getNode(language, node) as string;
+    const result = Language.getNode<string>(language, node);
     return message.channel.send(
       result
         .replace(/\{cmd\}/gi, command)

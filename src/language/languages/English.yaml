@@ -1,74 +1,3 @@
-command:
-  eval:
-    description: Evaluates code
-    name: eval
-    aliases: ["evaluate"]
-  help:
-    description: Lists and describes the {@commands.commands} the bot contains
-    name: "help"
-    examples: ["help", "help prefix"]
-    info: My prefix is `{prefix}`. You can also mention the bot as the prefix! For example `{mention} help` or `{prefix}help`. Execute `{prefix}help <{@commands.command}>` to find information on specific {@commands.commands}!
-  permissions:
-    name: permissions
-    aliases: ["perms", "perm", "permission"]
-    description: "Manage role permissions"
-    usage: "<add/remove/clear/list> <ROLE> <PERMISSION>"
-    examples: ["perms add @Developer botAdministrator"]
-    no-specific-perms: "{role} has no specific permissions!"
-    list-perms: "{role} has these permissions: {perms}"
-    add:
-      name: add
-      description: Add permissions to a role
-    remove:
-      name: remove
-      description: Remove permissions from a role
-    clear:
-      name: clear
-      description: Remove all permissions from a role
-    list:
-      name: list
-      description: List the permissions of a role / all the permissions
-  prefix:
-    name: prefix
-    description: Get/set the bot's prefix
-    examples: ["prefix", "prefix -"]
-    changeSuccess: "Successfully set the prefix to {prefix}"
-    changeFailure: "An error was encountered while trying to change the prefix!"
-    current: "The bot's prefix is {prefix}"
-  downloaddata:
-    name: downloaddata
-    aliases: ["download-data"]
-    description: Download the guild's data
-  ping:
-    name: ping
-    description: Get the bot's ping
-    aliases: ["pong"]
-    examples: ["ping"]
-  logging:
-    name: logging
-    aliases: ["logs"]
-    examples: logging enable <module>
-    description: Manage the logging settings
-    set:
-      name: set
-  calc:
-    name: calc
-    description: Calculate a math expression
-    aliases: ["calculate", "math", "mathematic", "mathematics", "maths"]
-    invalid: Please input a valid expression to calculate!
-  enable:
-    successGuild: "Successfully enabled {cmd}!"
-    successChannel: "Successfully enabled {cmd} in {channel}!"
-    alreadyEnabled: "{cmd} is already enabled!"
-    name: enable
-    description: Enable a {@commands.command}}/module (optionally in a specific channel)
-  disable:
-    disabled: "{cmd} can't be used in this channel!"
-    successGuild: "Successfully disabled {cmd}!"
-    successChannel: "Successfully disabled {cmd} in {channel}!"
-    alreadyDisabled: "{cmd} is already disabled!"
-    name: disable
-    description: Disable a {@commands.command}/module (optionally in a specific channel)
 permissions:
   botAdministrator: bot administrator
   kick: "kick"
@@ -120,3 +49,78 @@ category: Category
 examples: Examples
 subcommands: Subcommands
 aliases: Aliases
+command:
+  eval:
+    description: Evaluates code
+    name: eval
+    aliases: ["evaluate"]
+  help:
+    description: Lists and describes the {@commands.commands} the bot offers
+    name: "help"
+    examples: ["help", "help prefix"]
+    info: My prefix is `{prefix}`. You can also mention the bot as the prefix! For example `{mention} {@commands.help.name}` or `{prefix}{@commands.help.name}`. Execute `{prefix}{@commands.help.name} <{@commands.command}>` to find information on specific {@commands.commands}!
+  permissions:
+    name: permissions
+    aliases: ["perms", "perm", "permission"]
+    description: "Manage role permissions"
+    usage: "<{@command.permissions.add.name}/{@command.permissions.remove.name}/{@command.permissions.clear.name}/{@command.permissions.list.name}> <ROLE> <PERMISSION>"
+    examples:
+      [
+        "{@command.permissions.name} {@command.permissions.add.name} @Developer {@permissions.bypassFilter}, {@permissions.clearChat}",
+      ]
+    no-specific-perms: "{role} has no specific permissions!"
+    list-perms: "{role} has these permissions: {perms}"
+    add:
+      name: add
+      aliases: ["give"]
+      description: Add permissions to a role
+    remove:
+      name: remove
+      description: Remove permissions from a role
+    clear:
+      name: clear
+      description: Remove all permissions from a role
+    list:
+      name: list
+      description: List the permissions of a role / all the permissions
+  prefix:
+    name: prefix
+    description: Get/set the bot's prefix
+    examples: ["prefix", "prefix -"]
+    changeSuccess: "Successfully set the prefix to {prefix}"
+    changeFailure: "An error was encountered while trying to change the prefix!"
+    current: "The bot's prefix is {prefix}"
+  downloaddata:
+    name: downloaddata
+    aliases: ["download-data"]
+    description: Download the guild's data
+  ping:
+    name: ping
+    description: Get the bot's ping
+    aliases: ["pong"]
+    examples: ["ping"]
+  logging:
+    name: logging
+    aliases: ["logs"]
+    examples: logging enable <module>
+    description: Manage the logging settings
+    set:
+      name: set
+  calc:
+    name: calc
+    description: Calculate a math expression
+    aliases: ["calculate", "math", "mathematic", "mathematics", "maths"]
+    invalid: Please input a valid expression to calculate!
+  enable:
+    successGuild: "Successfully enabled {cmd}!"
+    successChannel: "Successfully enabled {cmd} in {channel}!"
+    alreadyEnabled: "{cmd} is already enabled!"
+    name: enable
+    description: Enable a {@commands.command}}/module (optionally in a specific channel)
+  disable:
+    disabled: "{cmd} can't be used in this channel!"
+    successGuild: "Successfully disabled {cmd}!"
+    successChannel: "Successfully disabled {cmd} in {channel}!"
+    alreadyDisabled: "{cmd} is already disabled!"
+    name: disable
+    description: Disable a {@commands.command}/module (optionally in a specific channel)

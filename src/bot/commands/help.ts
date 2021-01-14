@@ -113,7 +113,7 @@ export const Help: Command = {
       );
       embed.setDescription(
         `${translatedDesc}\n\n**${_.upperFirst(
-          Language.getNode(language, "commands.commands") as string
+          Language.getNode(language, "commands.commands")
         )}:**\n` + cmds.join("\n")
       );
       return message.channel.send(embed);
@@ -121,7 +121,7 @@ export const Help: Command = {
     let cmd: Command;
     let cmdList: string[] = [];
     for await (const c of commands) {
-      const name = Language.getNode(language, c.name) as string;
+      const name = Language.getNode<string>(language, c.name);
       const aliases = aliasesToString(language, c.aliases);
       cmdList.push(name);
       const result = name === command || aliases?.includes(command);
@@ -147,7 +147,7 @@ export const Help: Command = {
       _.upperFirst(
         Language.getNode(language, "commands.unknown") +
           "\n" +
-          (Language.getNode(language, "commands.maybe") as string).replace(
+          Language.getNode<string>(language, "commands.maybe").replace(
             /\{cmd\}/gi,
             "``" + possibleCmd.bestMatch.target + "``"
           )
@@ -213,7 +213,6 @@ export async function getCmdHelp(
         }`
       );
     }
-    console.log(subcmds);
     description.push(
       `**${Language.getNode(lang, "subcommands")}:**\n${aliasesToString(
         lang,

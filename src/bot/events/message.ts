@@ -58,12 +58,12 @@ async function startCommandParsing(message: Message) {
   else {
     const translatedCommands: string[] = [];
     for (const c of commands) {
-      translatedCommands.push(Language.getNode(language, c.name) as string);
+      translatedCommands.push(Language.getNode(language, c.name));
     }
     const bestMatch = stringSimilarity.findBestMatch(cmd, translatedCommands);
     const str = bestMatch.bestMatch.target;
     const unknownCmdMsg =
-      _.upperFirst(Language.getNode(language, "commands.unknown") as string) +
+      _.upperFirst(Language.getNode(language, "commands.unknown")) +
       " " +
       Language.getNode(language, "commands.maybe");
     return message.channel.send(unknownCmdMsg.replace("{cmd}", `\`${str}\``));
@@ -128,10 +128,10 @@ async function handleCommand(
       );
       if (disabled[0]) {
         message.channel.send(
-          (Language.getNode(
+          Language.getNode<string>(
             language,
             "command.disable.disabled"
-          ) as string).replace(/\{cmd\}/, (<any>command).id)
+          ).replace(/\{cmd\}/, (<any>command).id)
         );
         return;
       }
