@@ -1,14 +1,9 @@
 import fs from "fs";
 import yaml from "yaml";
-import { toPath } from "lodash";
-import { GuildData } from "../database/schemas/guilds";
+import { toPath, isMap } from "lodash";
+
 export namespace Language {
-  export async function languageInGuild(guildId: string): Promise<Lang> {
-    return (
-      ((await GuildData.findById(guildId))?.language as Lang) || Lang.English
-    );
-  }
-  export function parseInnerNodes<T>(language: Lang, newNode): T {
+  export function parseInnerNodes<T>(language: Lang, newNode: any): T {
     if (newNode == null) return null;
     if (typeof newNode === "string") {
       let node = newNode as string;
@@ -24,7 +19,6 @@ export namespace Language {
             const thing = getNode(language, placeholder);
             if (thing != null) {
               const replacement = typeof thing === "string" ? thing : thing[0];
-
               node = node.replace(`{@${placeholder}}`, replacement);
               i = start + replacement.length - 1;
             } else i = start + placeholder.length + 2;
@@ -39,11 +33,18 @@ export namespace Language {
       }
       return (nodes as unknown) as T;
     } else if (typeof newNode === "object") {
-      const nodes = {};
-      Object.entries(newNode).forEach((entry) => {
-        nodes[entry[0]] = parseInnerNodes<T>(language, entry[1]);
-      });
-      return (nodes as unknown) as T;
+      if (isMap(newNode)) {
+        newNode.forEach((value, key) => {
+          newNode.set(key, parseInnerNodes<T>(language, value));
+        });
+        return (newNode as unknown) as T;
+      } else {
+        const nodes = {};
+        Object.entries(newNode).forEach((entry) => {
+          nodes[entry[0]] = parseInnerNodes<T>(language, entry[1]);
+        });
+        return (nodes as unknown) as T;
+      }
     } else return (newNode as unknown) as T;
   }
 
@@ -51,18 +52,17 @@ export namespace Language {
     if (typeof node === "string") node = toPath(node);
     let newNode = nodes?.get(language);
     for (let i = 0; i < node.length; i++) {
-      newNode = newNode[node[i]];
-      if (newNode == null) return null;
+      if (isMap(newNode)) newNode = newNode.get(node[i]);
+      else return (newNode as unknown) as T;
     }
     return (newNode as unknown) as T;
   }
 }
 
 const files = fs.readdirSync(`${__dirname}/languages/`);
-type Node = {
-  [key: string]: Node | any;
-};
-const nodes: Map<Lang, Node> = new Map();
+type Node = Map<string, Node | any>;
+
+const nodes: Map<Lang, Map<string, Node>> = new Map();
 export enum Lang {
   English = "English",
 }
@@ -72,7 +72,18 @@ files.forEach((file) => {
       fs.readFileSync(`${__dirname}/languages/${file}`).toString()
     );
     const language = file.split(".")[0] as Lang;
-    nodes.set(language, json);
+    nodes.set(language, new Map());
+    function valuesToMap(map: Map<string, Node>, json: {}) {
+      Object.entries(json).forEach((entry) => {
+        if (typeof entry[1] === "object" && !Array.isArray(entry[1])) {
+          if (!map.has(entry[0])) map.set(entry[0], new Map());
+          valuesToMap(map.get(entry[0]), entry[1]);
+        } else {
+          map.set(entry[0], entry[1] as any);
+        }
+      });
+    }
+    valuesToMap(nodes.get(language), json);
   }
 });
 Array.from(nodes.entries()).forEach((entry) => {
