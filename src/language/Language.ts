@@ -1,24 +1,33 @@
 import fs from "fs";
 import yaml from "yaml";
+import { toPath } from "lodash";
 import { GuildData } from "../database/schemas/guilds";
-
 export namespace Language {
-  export function parseInnerNodes<T>(language: Lang, newNode: T): T {
+  export async function languageInGuild(guildId: string): Promise<Lang> {
+    return (
+      ((await GuildData.findById(guildId))?.language as Lang) || Lang.English
+    );
+  }
+  export function parseInnerNodes<T>(language: Lang, newNode): T {
     if (newNode == null) return null;
     if (typeof newNode === "string") {
       let node = newNode as string;
-      for (let i = 0; i < node.length; i++) {
+      bigLoop: for (let i = 0; i < node.length; i++) {
         if (node.charAt(i) === "{") {
-          const start = ++i;
+          const start = i++;
           if (node.charAt(i) === "@") {
-            while (node.charAt(i) !== "}") i++;
-            const placeholder = node.substring(start + 1, i);
+            for (; i < node.length; i++) {
+              if (node[i] === "}") break;
+              if (i === node.length - 1) break bigLoop;
+            }
+            const placeholder = node.substring(start + 2, i);
             const thing = getNode(language, placeholder);
-            if (thing != null)
-              node = node.replace(
-                `{@${placeholder}}`,
-                typeof thing === "string" ? thing : thing[0]
-              );
+            if (thing != null) {
+              const replacement = typeof thing === "string" ? thing : thing[0];
+
+              node = node.replace(`{@${placeholder}}`, replacement);
+              i = start + replacement.length - 1;
+            } else i = start + placeholder.length + 2;
           }
         }
       }
@@ -29,23 +38,31 @@ export namespace Language {
         nodes[i1] = parseInnerNodes<T>(language, newNode[i1]);
       }
       return (nodes as unknown) as T;
-    } else return newNode;
+    } else if (typeof newNode === "object") {
+      const nodes = {};
+      Object.entries(newNode).forEach((entry) => {
+        nodes[entry[0]] = parseInnerNodes<T>(language, entry[1]);
+      });
+      return (nodes as unknown) as T;
+    } else return (newNode as unknown) as T;
   }
 
-  export async function languageInGuild(guildId: string): Promise<Lang> {
-    return (
-      ((await GuildData.findById(guildId))?.language as Lang) || Lang.English
-    );
-  }
-
-  export function getNode<T>(language: Lang, node: string): T {
-    let newNode = nodes?.get(language)?.get(node);
-    return parseInnerNodes<T>(language, newNode);
+  export function getNode<T>(language: Lang, node: string | string[]): T {
+    if (typeof node === "string") node = toPath(node);
+    let newNode = nodes?.get(language);
+    for (let i = 0; i < node.length; i++) {
+      newNode = newNode[node[i]];
+      if (newNode == null) return null;
+    }
+    return (newNode as unknown) as T;
   }
 }
 
 const files = fs.readdirSync(`${__dirname}/languages/`);
-const nodes: Map<Lang, Map<string, any>> = new Map();
+type Node = {
+  [key: string]: Node | any;
+};
+const nodes: Map<Lang, Node> = new Map();
 export enum Lang {
   English = "English",
 }
@@ -55,30 +72,9 @@ files.forEach((file) => {
       fs.readFileSync(`${__dirname}/languages/${file}`).toString()
     );
     const language = file.split(".")[0] as Lang;
-    function search(json: Object, path = "") {
-      for (const k in json) {
-        if (json.hasOwnProperty(k))
-          if (typeof json[k] === "object" && !Array.isArray(json[k]))
-            search(json[k], (path ? path + "." : "") + k);
-          else {
-            if (!nodes.has(language)) nodes.set(language, new Map());
-            nodes.get(language).set((path ? path + "." : "") + k, json[k]);
-          }
-      }
-    }
-    search(json);
+    nodes.set(language, json);
   }
 });
-for (const [i, v] of Array.from(nodes.entries())) {
-  for (const [i2, v2] of Array.from(v.entries())) {
-    if (typeof v2 === "string") {
-      nodes.get(Lang[i]).set(i2, Language.parseInnerNodes<any>(Lang[i], v2));
-    } else if (Array.isArray(v2)) {
-      const nodess: any[] = [];
-      for (let i1 = 0; i1 < v2.length; i1++) {
-        nodess.push(Language.parseInnerNodes<any>(Lang[i], v2[i1]));
-      }
-      nodes.get(Lang[i]).set(i2, nodess);
-    }
-  }
-}
+Array.from(nodes.entries()).forEach((entry) => {
+  nodes.set(entry[0], Language.parseInnerNodes(entry[0], entry[1]));
+});

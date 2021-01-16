@@ -6,11 +6,12 @@
   "repository": "https://github.com/GammaTheBot/Gamma.git",
   "author": "DeltaRays",
   "license": "MIT",
+  "type": "commonjs",
   "private": true,
   "scripts": {
     "start": "yarn build && cross-env NODE_ENV=production node dist/index.js",
     "build": "tsc",
-    "dev": "nodemon ."
+    "dev": "nodemon src/index.ts"
   },
   "devDependencies": {
     "@types/jsdom": "^16.2.5",
