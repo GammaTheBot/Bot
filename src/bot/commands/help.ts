@@ -44,15 +44,15 @@ export const Help: Command = {
           .replace(/\{prefix\}/gi, await Guilds.getPrefix(message.guild?.id))
           .replace(/\{mention\}/gi, "@" + bot.user.username)
       );
-      for await (const category of Object.values(categories)) {
-        const name = `${Language.parseInnerNodes(language, category.name)}`;
+      for await (const category of categories.entries()) {
+        const name = `${Language.parseInnerNodes(language, category[1].name)}`;
         let stuff = `${Language.parseInnerNodes(
           language,
-          category.description
+          category[1].description
         )}`;
         const cmds: string[] = [];
-        if (category.commands) {
-          for await (const cmd of category.commands) {
+        if (category[1].commands) {
+          for await (const cmd of category[1].commands) {
             cmds.push(
               ((
                 await isCommandDisabled(cmd.id, message.channel as TextChannel)
@@ -75,13 +75,13 @@ export const Help: Command = {
       commands?: Command[];
     };
     let translatedName: string;
-    for await (const c of Object.values(categories)) {
-      const name = `${Language.parseInnerNodes(language, c.name)}`
+    for await (const c of categories.entries()) {
+      const name = `${Language.parseInnerNodes(language, c[1].name)}`
         ?.split(" ")
         ?.slice(1)
         ?.join(" ");
       if (name.toLowerCase() === command.toLowerCase()) {
-        cat = c;
+        cat = c[1];
         translatedName = name;
         break;
       }
@@ -193,7 +193,7 @@ export async function getCmdHelp(
       description.push(
         `**${Language.getNode(lang, "category")}:** ${Language.parseInnerNodes(
           lang,
-          categories[cmd.category].name
+          categories.get(cmd.category).name
         )}`
       );
   if ("examples" in cmd)
