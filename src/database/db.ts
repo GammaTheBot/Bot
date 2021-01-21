@@ -8,6 +8,7 @@ mongoose.connect(
     compression: {
       compressors: ["snappy", "zlib"],
     },
+    minPoolSize: 2,
   }
 );
 const dbase = mongoose.connection;

@@ -260,9 +260,17 @@ export function getCommand(
 export const commands: Command[] = [];
 
 export const commandsRunEdit: Command[] = [];
-export const categories: {
-  [key: string]: { description: string; name: string; commands?: Command[] };
-} = schema;
+export const categories: Map<
+  string,
+  {
+    description: string;
+    name: string;
+    commands?: Command[];
+  }
+> = new Map();
+Object.entries(schema).forEach((idk) => {
+  categories.set(idk[0], idk[1]);
+});
 
 async function loadCommands(dir: string): Promise<any> {
   const files = await fs.readdir(dir);
@@ -301,13 +309,13 @@ function loadCommand(cmd: Command, id: string) {
   if (!cmd.id) cmd.id = id;
   commands.push(cmd);
   if (cmd.editable) commandsRunEdit.push(cmd);
-  if (!categories[cmd.category]) {
+  if (!categories.has(cmd.category)) {
     console.error(`Category ${cmd.category} not found!`);
     return;
   }
-  if (!categories[cmd.category].commands) {
-    categories[cmd.category].commands = [cmd];
-  } else categories[cmd.category].commands.push(cmd);
+  if (!categories.get(cmd.category).commands) {
+    categories.get(cmd.category).commands = [cmd];
+  } else categories.get(cmd.category).commands.push(cmd);
 }
 
 loadCommands(`${__dirname}/commands/`).then(() => {

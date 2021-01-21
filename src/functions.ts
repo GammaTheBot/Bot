@@ -1,7 +1,3 @@
-export function firstCharToUpperCase(string: String): string {
-  let str = `${string}`;
-  return str[0].toUpperCase() + str.slice(1);
-}
 export function numberTh(num: number): string {
   const lastNum = num % 10;
   let th: string = null;
@@ -33,10 +29,10 @@ export function randomInteger(min = 0, max = 1): number {
   return Math.floor(Math.random() * (max - min) + 1) + min;
 }
 export function celsToFahr(a: number): number {
-  return Math.round(((a * 9) / 5 + 32) * 100) / 100;
+  return (((((a << 3) + a) / 5 /*fast way of doing *9*/ + 32) * 100) | 0) / 100;
 }
 export function fahrToCels(a: number): number {
-  return Math.round((((a - 32) * 5) / 9) * 100) / 100;
+  return ((((((a - 32) << 2) + 90) / 9) * 100) | 0) / 100;
 }
 export function numberComma(number: number): string {
   if (`${number}`.includes(".")) {
