@@ -6,7 +6,7 @@ export namespace Perms {
   export const noPermEmoji = `⛔`;
   export async function hasPermission(
     member: GuildMember,
-    perm: BotPermissions | BotPermissions[]
+    permissions: UserPermissions | UserPermissions[]
   ): Promise<boolean> {
     if (member.hasPermission("ADMINISTRATOR")) return true;
     const guild = member.guild;
@@ -16,33 +16,35 @@ export namespace Perms {
     for (const permObj of Object.entries(perms)) {
       if (roles.some((r) => r === permObj[0])) {
         const permsObj = permObj[1] as string[];
-        if (
-          permsObj.includes(perm.toString()) ||
-          permsObj.includes("botAdministrator")
-        )
+        if (permsObj.includes("botAdministrator")) return true;
+        if (Array.isArray(permissions)) {
+          for (const perm of permissions) {
+            if (!permsObj.includes(perm.toString())) return false;
+          }
           return true;
+        } else if (permsObj.includes(permissions.toString())) return true;
       }
     }
     return false;
   }
 }
-
-export type BotPermissions =
-  | "botAdministrator"
-  | "kick"
-  | "mute"
-  | "ban"
-  | "bypassChatFilter"
-  | "dj"
-  | "punishments"
-  | "clearChat"
-  | "counting"
-  | "logging"
-  | "loginFlow"
-  | "suggestions"
-  | "customCommands"
-  | "starboard"
-  | "roles"
-  | "experience"
-  | "managePermissions"
-  | "embeds";
+export enum UserPermissions {
+  botAdministrator,
+  kick,
+  mute,
+  ban,
+  bypassChatFilter,
+  dj,
+  punishments,
+  clearChat,
+  counting,
+  logging,
+  loginFlow,
+  suggestions,
+  customCommands,
+  starboard,
+  roles,
+  experience,
+  managePermissions,
+  embeds,
+}

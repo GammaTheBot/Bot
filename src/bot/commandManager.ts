@@ -6,10 +6,11 @@ import {
   TextChannel,
 } from "discord.js";
 import { promises as fs } from "fs";
+import fsSync from "fs";
 import { ChannelData } from "../database/schemas/channels";
 import { toMs } from "../functions";
 import { Lang, Language } from "../language/Language";
-import { BotPermissions } from "../Perms";
+import { UserPermissions } from "../Perms";
 import { Utils } from "../Utils";
 import { bot } from "./bot";
 /*
@@ -30,7 +31,7 @@ export interface BaseCommand {
   botOwnerOnly?: boolean;
   guildOwnerOnly?: boolean;
   clientPermissions?: PermissionResolvable | PermissionResolvable[];
-  userPermissions?: BotPermissions | BotPermissions[];
+  userPermissions?: UserPermissions | UserPermissions[];
   args?: Arg[];
   exec(
     message: Message,
@@ -228,12 +229,12 @@ export function aliasesToString(
 ): string[] {
   if (!aliases) return null;
   if (typeof aliases === "string") {
-    const alises = Language.getNode<string|string[]>(language, aliases);
+    const alises = Language.getNode<string | string[]>(language, aliases);
     return typeof alises === "string" ? [alises] : alises;
   }
   const result = [];
   for (const alias of aliases) {
-    result.push(Language.parseInnerNodes<string|string[]>(language, alias));
+    result.push(Language.parseInnerNodes<string | string[]>(language, alias));
   }
   return result;
 }
@@ -265,9 +266,11 @@ export const categories: {
 
 async function loadCommands(dir: string): Promise<any> {
   const files = await fs.readdir(dir);
+  console.log(Date.now() + "e");
   for await (let file of files) {
     if (file.endsWith(".ts")) {
       const cmds = await import(`${dir}/${file}`);
+      console.log(Date.now());
       for (const v of Object.entries(cmds)) {
         const cmd = <Command>v[1];
         if ("category" in cmd) {

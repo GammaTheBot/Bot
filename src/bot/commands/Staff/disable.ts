@@ -1,6 +1,7 @@
 import Discord from "discord.js";
 import { ChannelData } from "../../../database/schemas/channels";
 import { Language } from "../../../language/Language";
+import { UserPermissions } from "../../../Perms";
 import {
   ArgType,
   Command,
@@ -23,7 +24,7 @@ export const Disable: Command = {
       type: ArgType.channel,
     },
   ],
-  userPermissions: "botAdministrator",
+  userPermissions: UserPermissions.botAdministrator,
   exec: async (
     message,
     { command, channel }: { command: string; channel: Discord.GuildChannel },

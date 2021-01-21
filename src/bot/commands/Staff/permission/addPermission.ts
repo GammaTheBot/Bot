@@ -1,4 +1,6 @@
 import { Role } from "discord.js";
+import { Language } from "../../../../language/Language";
+import { UserPermissions } from "../../../../Perms";
 import { ArgType, BaseCommand } from "../../../commandManager";
 
 export const AddPermission: BaseCommand = {
@@ -23,6 +25,11 @@ export const AddPermission: BaseCommand = {
     { permission, role }: { permission: string; role: Role },
     language
   ) => {
-    const permissions = permission.split(",");
+    const permissionList = permission.split(",");
+    const botPermissions = Language.getNode<Map<UserPermissions, string>>(
+      language,
+      "permissions"
+    );
+    console.log(botPermissions.get(UserPermissions.managePermissions));
   },
 };

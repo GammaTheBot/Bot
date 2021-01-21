@@ -1,7 +1,7 @@
 import { GuildData } from "../../../database/schemas/guilds";
 import { Guilds } from "../../../Guilds";
 import { Language } from "../../../language/Language";
-import { Perms } from "../../../Perms";
+import { Perms, UserPermissions } from "../../../Perms";
 import { ArgType, Command } from "../../commandManager";
 export const Prefix: Command = {
   name: "command.prefix.name",
@@ -19,7 +19,12 @@ export const Prefix: Command = {
   description: "command.prefix.description",
   exec: async (message, { prefix }: { prefix: string }, language) => {
     if (prefix) {
-      if (await Perms.hasPermission(message.member, "botAdministrator")) {
+      if (
+        await Perms.hasPermission(
+          message.member,
+          UserPermissions.botAdministrator
+        )
+      ) {
         try {
           await GuildData.updateOne(
             { _id: message.guild.id },

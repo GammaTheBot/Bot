@@ -2,6 +2,7 @@ import { MessageEmbed, Role } from "discord.js";
 import { RoleData } from "../../../../database/schemas/roles";
 import { Guilds } from "../../../../Guilds";
 import { Language } from "../../../../language/Language";
+import { UserPermissions } from "../../../../Perms";
 import { Utils } from "../../../../Utils";
 import { bot } from "../../../bot";
 import { ArgType, Command } from "../../../commandManager";
@@ -14,7 +15,7 @@ export const Permission: Command = {
   category: "Staff",
   aliases: "command.permissions.aliases",
   examples: "command.permissions.examples",
-  userPermissions: "managePermissions",
+  userPermissions: UserPermissions.managePermissions,
   args: [
     {
       name: "role",
