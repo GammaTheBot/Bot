@@ -24,7 +24,7 @@ export const Disable: Command = {
       type: ArgType.channel,
     },
   ],
-  userPermissions: UserPermissions.botAdministrator,
+  userPermissions: UserPermissions.administrator,
   exec: async (
     message,
     { command, channel }: { command: string; channel: Discord.GuildChannel },

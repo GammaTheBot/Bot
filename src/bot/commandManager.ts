@@ -274,11 +274,9 @@ Object.entries(schema).forEach((idk) => {
 
 async function loadCommands(dir: string): Promise<any> {
   const files = await fs.readdir(dir);
-  console.log(Date.now() + "e");
   for await (let file of files) {
     if (file.endsWith(".ts")) {
       const cmds = await import(`${dir}/${file}`);
-      console.log(Date.now());
       for (const v of Object.entries(cmds)) {
         const cmd = <Command>v[1];
         if ("category" in cmd) {

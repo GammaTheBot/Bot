@@ -20,10 +20,7 @@ export const Prefix: Command = {
   exec: async (message, { prefix }: { prefix: string }, language) => {
     if (prefix) {
       if (
-        await Perms.hasPermission(
-          message.member,
-          UserPermissions.botAdministrator
-        )
+        await Perms.hasPermission(message.member, UserPermissions.administrator)
       ) {
         try {
           await GuildData.updateOne(

@@ -16,7 +16,7 @@ export namespace Perms {
     for (const permObj of Object.entries(perms)) {
       if (roles.some((r) => r === permObj[0])) {
         const permsObj = permObj[1] as string[];
-        if (permsObj.includes("botAdministrator")) return true;
+        if (permsObj.includes("administrator")) return true;
         if (Array.isArray(permissions)) {
           for (const perm of permissions) {
             if (!permsObj.includes(perm.toString())) return false;
@@ -29,22 +29,22 @@ export namespace Perms {
   }
 }
 export enum UserPermissions {
-  botAdministrator,
-  kick,
-  mute,
-  ban,
-  bypassChatFilter,
-  dj,
-  punishments,
-  clearChat,
-  counting,
-  logging,
-  loginFlow,
-  suggestions,
-  customCommands,
-  starboard,
-  roles,
-  experience,
-  managePermissions,
-  embeds,
+  administrator = "administrator",
+  kick = "kick",
+  mute = "mute",
+  ban = "ban",
+  bypassFilter = "bypassFilter",
+  dj = "dj",
+  punishments = "punishments",
+  clearChat = "clearChat",
+  counting = "counting",
+  logging = "logging",
+  loginFlow = "loginFlow",
+  suggestions = "suggestions",
+  customCommands = "customCommands",
+  starboard = "starboard",
+  roles = "roles",
+  experience = "experience",
+  managePermissions = "managePermissions",
+  embeds = "embeds",
 }

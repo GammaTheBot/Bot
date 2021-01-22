@@ -1,5 +1,5 @@
 permissions:
-  botAdministrator: bot administrator
+  administrator: administrator
   kick: "kick"
   mute: "mute"
   ban: "ban"
@@ -41,7 +41,12 @@ noperms:
   botOwner: "Only the bot owner can do this!"
   general: "You don't have enough permissions to do this!"
   bot: "The bot doesn't have enough permissions to do this!"
+added: Added
+permss: Permissions
+current: Current
+unexisting: Unexisting
 help: Help
+error: An error was encountered!
 name: Name
 usage: Usage
 description: Description
@@ -62,27 +67,29 @@ command:
   permissions:
     name: permissions
     aliases: ["perms", "perm", "permission"]
-    description: "Manage role permissions"
+    description: "Manage role {@perms}"
     usage: "<{@command.permissions.add.name}/{@command.permissions.remove.name}/{@command.permissions.clear.name}/{@command.permissions.list.name}> <ROLE> <PERMISSION>"
     examples:
       [
         "{@command.permissions.name} {@command.permissions.add.name} @Developer {@permissions.bypassFilter}, {@permissions.clearChat}",
       ]
-    no-specific-perms: "{role} has no specific permissions!"
-    list-perms: "{role} has these permissions: {perms}"
+    no-specific-perms: "{role} has no specific {@perms}!"
+    list-perms: "{role} has these {@perms}: {perms}"
+    enterPerms: "Please enter valid {@perms}"
     add:
       name: add
       aliases: ["give"]
-      description: Add permissions to a role
+      description: Add {@perms} to a role
+      added: Permissions Successfully Added
     remove:
       name: remove
-      description: Remove permissions from a role
+      description: Remove {@perms} from a role
     clear:
       name: clear
-      description: Remove all permissions from a role
+      description: Remove all {@perms} from a role
     list:
       name: list
-      description: List the permissions of a role / all the permissions
+      description: List the {@perms} of a role / all the {@perms}
   prefix:
     name: prefix
     description: Get/set the bot's prefix
