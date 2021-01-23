@@ -8,6 +8,7 @@ import { bot } from "../../../bot";
 import { ArgType, Command } from "../../../commandManager";
 import { getCmdHelp } from "../../help";
 import { AddPermission } from "./addPermission";
+import { ClearPermission } from "./clearPermission";
 import { ListPermissions } from "./listPermission";
 
 export const Permission: Command = {
@@ -66,5 +67,5 @@ export const Permission: Command = {
       }
     }
   },
-  subcommands: [ListPermissions, AddPermission],
+  subcommands: [ListPermissions, AddPermission, ClearPermission],
 };

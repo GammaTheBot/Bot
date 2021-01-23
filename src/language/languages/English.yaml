@@ -122,6 +122,7 @@ command:
     clear:
       name: clear
       description: Remove all {@perms} from a role
+      success: Successfully removed all {@perms} from {role}
     list:
       name: list
       description: List the {@perms} of a role / all the {@perms}

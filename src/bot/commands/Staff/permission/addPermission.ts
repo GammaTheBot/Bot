@@ -1,11 +1,10 @@
 import { MessageEmbed, Role } from "discord.js";
+import { upperFirst } from "lodash";
+import { RoleData } from "../../../../database/schemas/roles";
+import { Guilds } from "../../../../Guilds";
 import { Language } from "../../../../language/Language";
 import { UserPermissions } from "../../../../Perms";
 import { ArgType, BaseCommand } from "../../../commandManager";
-import { Connection } from "mongoose";
-import { RoleData } from "../../../../database/schemas/roles";
-import { Guilds } from "../../../../Guilds";
-import { upperFirst } from "lodash";
 export const AddPermission: BaseCommand = {
   name: "command.permissions.add.name",
   description: "command.permissions.add.description",
@@ -36,21 +35,16 @@ export const AddPermission: BaseCommand = {
       return message.channel.send(
         Language.getNode(language, "command.permissions.enterPerms")
       );
-    const botPermissions = Language.getNode<Map<UserPermissions, string>>(
-      language,
-      "permissions"
-    );
+    const botPermissions = Language.getNode<
+      Map<UserPermissions, Map<"name" | "description", string>>
+    >(language, "permissions");
     const actualPerms: Set<string> = new Set();
     let unexistingPerms: string[] = [];
     try {
       const doc = await RoleData.findById(message.guild.id);
-      permissionList.forEach((perm) => {
-        if (!Array.from(botPermissions.values()).includes(perm))
-          unexistingPerms.push(perm);
-      });
       bigLoop: for (const perm of permissionList) {
         for (const [v, i] of botPermissions) {
-          if (perm === i) {
+          if (perm === i.get("name")) {
             actualPerms.add(v.toString());
             continue bigLoop;
           }
@@ -75,9 +69,11 @@ export const AddPermission: BaseCommand = {
         .setTitle(Language.getNode(language, "command.permissions.add.added"))
         .setFooter(message.author.tag, message.author.displayAvatarURL());
       embed.addField(
-        Language.getNode(language, "added"),
+        upperFirst(Language.getNode(language, "added")),
         newPerms
-          .map((p) => `\`${botPermissions.get(UserPermissions[p])}\``)
+          .map(
+            (p) => `\`${botPermissions.get(UserPermissions[p]).get("name")}\``
+          )
           .join(", ")
       );
 
@@ -89,7 +85,9 @@ export const AddPermission: BaseCommand = {
       embed.addField(
         upperFirst(Language.getNode(language, "current")),
         [...actualPerms]
-          .map((p) => `\`${botPermissions.get(UserPermissions[p])}\``)
+          .map(
+            (p) => `\`${botPermissions.get(UserPermissions[p]).get("name")}\``
+          )
           .join(", ")
       );
 
