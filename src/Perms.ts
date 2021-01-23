@@ -39,12 +39,11 @@ export enum UserPermissions {
   clearChat = "clearChat",
   counting = "counting",
   logging = "logging",
-  loginFlow = "loginFlow",
+  joinFlow = "joinFlow",
   suggestions = "suggestions",
   customCommands = "customCommands",
   starboard = "starboard",
   roles = "roles",
   experience = "experience",
-  managePermissions = "managePermissions",
   embeds = "embeds",
 }

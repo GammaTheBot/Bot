@@ -1,5 +1,5 @@
 import { Message, MessageEmbed, TextChannel } from "discord.js";
-import _ from "lodash";
+import _, { upperFirst } from "lodash";
 import stringSimilarity from "string-similarity";
 import { LanguageService } from "typescript";
 import { Guilds } from "../../Guilds";
@@ -37,7 +37,9 @@ export const Help: Command = {
         .setTimestamp()
         .setColor(await Guilds.getColor(message.guild?.id))
         .setTitle(
-          bot.user.username + " " + Language.parseInnerNodes(language, "help")
+          bot.user.username +
+            " " +
+            upperFirst(Language.getNode(language, "help"))
         );
       embed.setDescription(
         `${Language.getNode(language, "command.help.info")}\n`
@@ -94,7 +96,7 @@ export const Help: Command = {
         .setTitle(
           bot.user.username +
             " " +
-            Language.parseInnerNodes(language, "help") +
+            upperFirst(Language.getNode(language, "help")) +
             " | " +
             _.startCase(translatedName)
         );
@@ -163,35 +165,37 @@ export async function getCmdHelp(
   lang: Lang
 ): Promise<string> {
   let description = [
-    `**${Language.getNode(lang, "name")}:** ${Language.getNode(
+    `**${upperFirst(Language.getNode(lang, "name"))}:** ${Language.getNode(
       lang,
       cmd.name
     )}`,
   ];
   if (cmd.description)
     description.push(
-      `**${Language.getNode(lang, "description")}:** ${Language.getNode(
-        lang,
-        cmd.description
-      )}`
+      `**${upperFirst(
+        Language.getNode(lang, "description")
+      )}:** ${Language.getNode(lang, cmd.description)}`
     );
   if (cmd.usage)
     description.push(
-      `**${Language.getNode(lang, "usage")}:** ${Language.parseInnerNodes(
-        lang,
-        cmd.usage
-      )}`
+      `**${upperFirst(
+        Language.getNode(lang, "usage")
+      )}:** ${Language.parseInnerNodes(lang, cmd.usage)}`
     );
   if (cmd.aliases) {
     const aliases = aliasesToString(lang, cmd.aliases);
     description.push(
-      `**${Language.getNode(lang, "aliases")}:** \`${aliases.join("`, `")}\``
+      `**${upperFirst(Language.getNode(lang, "aliases"))}:** \`${aliases.join(
+        "`, `"
+      )}\``
     );
   }
   if ("category" in cmd)
     if (cmd.category)
       description.push(
-        `**${Language.getNode(lang, "category")}:** ${Language.parseInnerNodes(
+        `**${upperFirst(
+          Language.getNode(lang, "category")
+        )}:** ${Language.parseInnerNodes(
           lang,
           categories.get(cmd.category).name
         )}`
@@ -199,10 +203,9 @@ export async function getCmdHelp(
   if ("examples" in cmd)
     if (cmd.examples)
       description.push(
-        `**${Language.getNode(lang, "examples")}:** \`${aliasesToString(
-          lang,
-          cmd.examples
-        )}\``
+        `**${upperFirst(
+          Language.getNode(lang, "examples")
+        )}:** \`${aliasesToString(lang, cmd.examples)}\``
       );
   if (cmd.subcommands && cmd.subcommands?.length > 0) {
     const subcmds: string[] = [];
@@ -214,10 +217,9 @@ export async function getCmdHelp(
       );
     }
     description.push(
-      `**${Language.getNode(lang, "subcommands")}:**\n${aliasesToString(
-        lang,
-        subcmds
-      ).join("\n")}`
+      `**${upperFirst(
+        Language.getNode(lang, "subcommands")
+      )}:**\n${aliasesToString(lang, subcmds).join("\n")}`
     );
   }
   return description.join("\n");

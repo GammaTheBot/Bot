@@ -5,6 +5,7 @@ import { ArgType, BaseCommand } from "../../../commandManager";
 import { Connection } from "mongoose";
 import { RoleData } from "../../../../database/schemas/roles";
 import { Guilds } from "../../../../Guilds";
+import { upperFirst } from "lodash";
 export const AddPermission: BaseCommand = {
   name: "command.permissions.add.name",
   description: "command.permissions.add.description",
@@ -22,12 +23,15 @@ export const AddPermission: BaseCommand = {
       otherPositions: [0],
     },
   ],
+  userPermissions: UserPermissions.administrator,
   exec: async (
     message,
     { permission, role }: { permission: string; role: Role },
     language
   ) => {
-    let permissionList = permission.split(",");
+    let permissionList = permission
+      .split(",")
+      .map((p) => p.trim().toLowerCase());
     if (permissionList.length < 1)
       return message.channel.send(
         Language.getNode(language, "command.permissions.enterPerms")
@@ -36,8 +40,6 @@ export const AddPermission: BaseCommand = {
       language,
       "permissions"
     );
-
-    permissionList = permissionList.map((i) => i.trim());
     const actualPerms: Set<string> = new Set();
     let unexistingPerms: string[] = [];
     try {
@@ -46,9 +48,15 @@ export const AddPermission: BaseCommand = {
         if (!Array.from(botPermissions.values()).includes(perm))
           unexistingPerms.push(perm);
       });
-      botPermissions.forEach((v, i) => {
-        if (permissionList.includes(v)) actualPerms.add(i.toString());
-      });
+      bigLoop: for (const perm of permissionList) {
+        for (const [v, i] of botPermissions) {
+          if (perm === i) {
+            actualPerms.add(v.toString());
+            continue bigLoop;
+          }
+        }
+        unexistingPerms.push(perm);
+      }
       if (actualPerms.size < 1)
         return message.channel.send(
           Language.getNode<string>(language, "command.permissions.enterPerms")
@@ -68,16 +76,18 @@ export const AddPermission: BaseCommand = {
         .setFooter(message.author.tag, message.author.displayAvatarURL());
       embed.addField(
         Language.getNode(language, "added"),
-        newPerms.map((p) => `\`${UserPermissions[p]}\``).join(", ")
+        newPerms
+          .map((p) => `\`${botPermissions.get(UserPermissions[p])}\``)
+          .join(", ")
       );
 
       if (unexistingPerms.length > 0)
         embed.addField(
-          Language.getNode(language, "unexisting"),
+          upperFirst(Language.getNode(language, "unexisting")),
           unexistingPerms.map((p) => `\`${p}\``).join(", ")
         );
       embed.addField(
-        Language.getNode(language, "current"),
+        upperFirst(Language.getNode(language, "current")),
         [...actualPerms]
           .map((p) => `\`${botPermissions.get(UserPermissions[p])}\``)
           .join(", ")

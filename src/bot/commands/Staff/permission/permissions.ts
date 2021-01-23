@@ -15,7 +15,7 @@ export const Permission: Command = {
   category: "Staff",
   aliases: "command.permissions.aliases",
   examples: "command.permissions.examples",
-  userPermissions: UserPermissions.managePermissions,
+  userPermissions: UserPermissions.administrator,
   args: [
     {
       name: "role",
