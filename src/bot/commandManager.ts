@@ -21,6 +21,7 @@ import { bot } from "./bot";
  *
  * */
 import schema from "./commands/categories.json";
+import { last } from "lodash";
 
 export interface BaseCommand {
   name: string;
@@ -130,7 +131,7 @@ export function convertType(
       return arg;
   }
 }
-
+// TODO add support for per-language argument names
 export function parseArgs(
   args: Arg[],
   stringArray: string[],
@@ -293,11 +294,39 @@ async function loadCommands(dir: string): Promise<any> {
 export function getCommandUsage(cmd: Command | BaseCommand): string {
   if (!cmd.usage) {
     const usage = [`{@${cmd.name}}`];
-    if (cmd.args)
-      for (const arg of cmd.args) {
-        const t = arg.name || arg.type;
-        usage.push(arg.optional ? `[${t}]` : `<${t}>`);
-      }
+    if (cmd.args) {
+      const doneArgs: Set<string> = new Set();
+      const argsByIndex: Arg[][] = [];
+      cmd.args.forEach((arg, i) => {
+        if (!arg.positions || arg?.positions?.length < 1) arg.positions = [i];
+        arg?.positions?.forEach((pos) => {
+          if (argsByIndex[pos]) argsByIndex[pos].push(arg);
+          else argsByIndex[pos] = [arg];
+        });
+      });
+      argsByIndex.forEach((args, i) => {
+        let argsToAdd: Arg[] = [];
+        args.forEach((arg) => {
+          if (
+            arg.positions.length == 1 ||
+            (argsToAdd.length === 0 && !doneArgs.has(arg.name))
+          ) {
+            argsToAdd.push(arg);
+            doneArgs.add(arg.name);
+          }
+        });
+        if (argsToAdd.length > 0)
+          usage.push(
+            `${
+              argsToAdd.length === 1
+                ? argsToAdd[0].optional
+                  ? `[${argsToAdd[0].name}]`
+                  : `<${argsToAdd[0].name}>`
+                : argsToAdd.map((a) => a.name).join("|")
+            }`
+          );
+      });
+    }
     return usage.join(" ");
   }
   return cmd.usage;
