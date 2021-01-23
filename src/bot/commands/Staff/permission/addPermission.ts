@@ -5,6 +5,7 @@ import { Guilds } from "../../../../Guilds";
 import { Language } from "../../../../language/Language";
 import { UserPermissions } from "../../../../Perms";
 import { ArgType, BaseCommand } from "../../../commandManager";
+import stringSimilarity from "string-similarity";
 export const AddPermission: BaseCommand = {
   name: "command.permissions.add.name",
   description: "command.permissions.add.description",
@@ -77,11 +78,22 @@ export const AddPermission: BaseCommand = {
           .join(", ")
       );
 
-      if (unexistingPerms.length > 0)
+      if (unexistingPerms.length > 0) {
+        const botValues = [...botPermissions.values()].map((p) =>
+          p.get("name")
+        );
         embed.addField(
           upperFirst(Language.getNode(language, "unexisting")),
-          unexistingPerms.map((p) => `\`${p}\``).join(", ")
+          unexistingPerms
+            .map(
+              (p) =>
+                `\`${p}\` (🤔 ${
+                  stringSimilarity.findBestMatch(p, botValues).bestMatch.target
+                })`
+            )
+            .join(", ")
         );
+      }
       embed.addField(
         upperFirst(Language.getNode(language, "current")),
         [...actualPerms]

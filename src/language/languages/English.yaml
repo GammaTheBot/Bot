@@ -75,6 +75,7 @@ noperms:
   general: "You don't have enough permissions to do this!"
   bot: "The bot doesn't have enough permissions to do this!"
 added: added
+removed: removed
 perms: permissions
 current: current
 unexisting: unexisting
@@ -119,6 +120,7 @@ command:
     remove:
       name: remove
       description: Remove {@perms} from a role
+      aliases: ["subtract"]
     clear:
       name: clear
       description: Remove all {@perms} from a role

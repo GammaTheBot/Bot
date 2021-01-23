@@ -47,12 +47,9 @@ export const ListPermissions: BaseCommand = {
               .replace(
                 /\{perms\}/gi,
                 permissions
-                  .map((p) => {
-                    console.log(UserPermissions[p]);
-                    return `\`${BotPerms.get(UserPermissions[p]).get(
-                      "name"
-                    )}\``;
-                  })
+                  .map(
+                    (p) => `\`${BotPerms.get(UserPermissions[p]).get("name")}\``
+                  )
                   .join(", ")
               )
           );

@@ -10,6 +10,7 @@ import { getCmdHelp } from "../../help";
 import { AddPermission } from "./addPermission";
 import { ClearPermission } from "./clearPermission";
 import { ListPermissions } from "./listPermission";
+import { RemovePermission } from "./removePermission";
 
 export const Permission: Command = {
   name: "command.permissions.name",
@@ -67,5 +68,10 @@ export const Permission: Command = {
       }
     }
   },
-  subcommands: [ListPermissions, AddPermission, ClearPermission],
+  subcommands: [
+    ListPermissions,
+    AddPermission,
+    ClearPermission,
+    RemovePermission,
+  ],
 };
