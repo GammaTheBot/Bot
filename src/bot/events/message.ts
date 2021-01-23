@@ -1,5 +1,5 @@
-import Discord, { Message, TextChannel } from "discord.js";
-import _, { upperFirst } from "lodash";
+import Discord, { DataResolver, Message, TextChannel } from "discord.js";
+import _, { startCase } from "lodash";
 import stringSimilarity from "string-similarity";
 import { GuildData } from "../../database/schemas/guilds";
 import { Guilds } from "../../Guilds";
@@ -174,7 +174,7 @@ async function handleCommand(
         .setTimestamp()
         .setAuthor(message.author.tag, message.author.displayAvatarURL())
         .setDescription(
-          `${upperFirst(
+          `${startCase(
             Language.getNode(language, "commands.missing-args")
           )}\n${usage.join(" ")}`
         );

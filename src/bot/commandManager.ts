@@ -67,7 +67,7 @@ export interface Arg {
   match?: "everything" | "others";
   optional?: boolean;
   default?: any;
-  otherPositions?: number[];
+  positions?: number[];
   name: string;
 }
 
@@ -141,9 +141,10 @@ export function parseArgs(
 
   const missingArgs: Set<string> = new Set();
   for (const [i, arg] of args.entries()) {
-    if (!argArray[i]) argArray[i] = new Set();
-    argArray[i].add(arg);
-    arg.otherPositions?.forEach((op) => {
+    if (!arg.positions) arg.positions = [i];
+    else if (arg.positions.length < 1) arg.positions.push(i);
+
+    arg.positions?.forEach((op) => {
       if (!argArray[op]) argArray[op] = new Set();
       argArray[op].add(arg);
     });
@@ -163,6 +164,7 @@ export function parseArgs(
   }
   entireLoop: for (const [i, possibleArg] of argArray.entries()) {
     currentArg: for (const arg of possibleArg) {
+      if (result.has(arg.name)) continue;
       if (arg.match === "everything") {
         if (argArray[i + 1]) {
           remainingEverythings.push(arg);
@@ -188,8 +190,7 @@ export function parseArgs(
           break;
         } else if (
           !arg.optional &&
-          (!arg.otherPositions ||
-            arg.otherPositions[arg.otherPositions.length - 1] === i) &&
+          arg.positions[arg.positions.length - 1] === i &&
           remainingEverythings.length < 1
         ) {
           missingArgs.add(arg.name);

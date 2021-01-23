@@ -12,7 +12,6 @@ export const ClearPermission: BaseCommand = {
     {
       name: "role",
       type: ArgType.role,
-      otherPositions: [0],
     },
   ],
   userPermissions: UserPermissions.administrator,

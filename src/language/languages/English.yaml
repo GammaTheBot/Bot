@@ -106,12 +106,14 @@ command:
     examples:
       [
         "{@command.permissions.name} {@command.permissions.add.name} @Developer {@permissions.bypassFilter.name}, {@permissions.clearChat.name}",
-        "{@command.permissions.name} {@command.permissions.list.name}",
+        "{@command.permissions.name} {@command.permissions.list.name} @DeltaRays#0054",
       ]
     no-specific-perms: "{role} has no specific {@perms}!"
     list-perms: "{role} has these {@perms}:\n{perms}"
+    member-perms: "{member} has {@perms} from these roles:\n\n{permissions}"
     perm-list: Permission list
     enterPerms: "Please enter valid {@perms}"
+    hasAdminPerm: "{role} has the Administrator permission."
     add:
       name: add
       aliases: ["give"]
@@ -127,7 +129,7 @@ command:
       success: Successfully removed all {@perms} from {role}
     list:
       name: list
-      description: List the {@perms} of a role / all the {@perms}
+      description: List the {@perms} of a role or an user / all the {@perms}
   prefix:
     name: prefix
     description: Get/set the bot's prefix
