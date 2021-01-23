@@ -205,7 +205,9 @@ export async function getCmdHelp(
       description.push(
         `**${upperFirst(
           Language.getNode(lang, "examples")
-        )}:** \`${aliasesToString(lang, cmd.examples).join("\n")}\``
+        )}:** \n${aliasesToString(lang, cmd.examples)
+          .map((p) => `• \`\`${p}\`\``)
+          .join("\n")}`
       );
   if (cmd.subcommands && cmd.subcommands?.length > 0) {
     const subcmds: string[] = [];
