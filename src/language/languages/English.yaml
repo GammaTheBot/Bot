@@ -1,22 +1,55 @@
 permissions:
-  botAdministrator: bot administrator
-  kick: "kick"
-  mute: "mute"
-  ban: "ban"
-  bypassFilter: "bypass filter"
-  dj: dj
-  punishments: "punishments"
-  clearChat: "clear chat"
-  counting: "manage counting"
-  logging: "manage logging"
-  loginFlow: "manage login flow"
-  suggestions: "manage suggestions"
-  customCommands: "manage custom commands"
-  starboard: "manage starboard"
-  roles: "manage roles"
-  experience: "manage experience"
-  managePermissions: "manage permissions"
-  embeds: "manage embeds"
+  administrator:
+    name: administrator
+    description: All the permissions and manage permissions (Enabled for people with the administrator permission)
+  kick:
+    name: kick
+    description: Kick command
+  mute:
+    name: mute
+    description: Mute and unmute commands
+  ban:
+    name: ban
+    description: Ban and unban commands
+  bypassFilter:
+    name: "bypass filter"
+    description: Bypass the chat filter
+  dj:
+    name: dj
+    description: "Bypass music command thresholds"
+  punishments:
+    name: "punishments"
+    description: "Access to edit and view punishments"
+  clearChat:
+    name: "clear chat"
+    description: "Clear command"
+  counting:
+    name: "manage counting"
+    description: "Manage counting channel(s)"
+  logging:
+    name: "manage logging"
+    description: "Manage logging channel(s)"
+  joinFlow:
+    name: "manage join flow"
+    description: "Manage the steps users go through when joining a server"
+  suggestions:
+    name: "manage suggestions"
+    description: "Manage the suggestions system"
+  customCommands:
+    name: "manage custom commands"
+    description: "Create, edit and delete custom commands"
+  starboard:
+    name: "manage starboard"
+    description: "Change starboard emoji, channel, and emoji count"
+  roles:
+    name: "manage roles"
+    description: "Gives access to manage voice roles, statistic roles, etc."
+  experience:
+    name: "manage experience"
+    description: "Manage experience roles, experience multiplier, level announcements, ..."
+  embeds:
+    name: "manage embeds"
+    description: "Create custom embeds"
 
 categories:
   Utility:
@@ -34,21 +67,27 @@ commands:
   unknown: "{@commands.command} not found!"
   maybe: "Maybe you meant {cmd}"
   missing-args: "{@commands.args} missing!"
-  arg: Argument
-  args: Arguments
+  arg: argument
+  args: arguments
 noperms:
   guildOwner: "Only the server owner can do this!"
   botOwner: "Only the bot owner can do this!"
   general: "You don't have enough permissions to do this!"
   bot: "The bot doesn't have enough permissions to do this!"
-help: Help
-name: Name
-usage: Usage
-description: Description
-category: Category
-examples: Examples
-subcommands: Subcommands
-aliases: Aliases
+added: added
+removed: removed
+perms: permissions
+current: current
+unexisting: unexisting
+help: help
+error: An error was encountered!
+name: name
+usage: usage
+description: description
+category: category
+examples: examples
+subcommands: subcommands
+aliases: aliases
 command:
   eval:
     description: Evaluates code
@@ -62,27 +101,35 @@ command:
   permissions:
     name: permissions
     aliases: ["perms", "perm", "permission"]
-    description: "Manage role permissions"
+    description: "Manage role {@perms}"
     usage: "<{@command.permissions.add.name}/{@command.permissions.remove.name}/{@command.permissions.clear.name}/{@command.permissions.list.name}> <ROLE> <PERMISSION>"
     examples:
       [
-        "{@command.permissions.name} {@command.permissions.add.name} @Developer {@permissions.bypassFilter}, {@permissions.clearChat}",
+        "{@command.permissions.name} {@command.permissions.add.name} @Developer {@permissions.bypassFilter.name}, {@permissions.clearChat.name}",
+        "{@command.permissions.name} {@command.permissions.list.name} @DeltaRays#0054",
       ]
-    no-specific-perms: "{role} has no specific permissions!"
-    list-perms: "{role} has these permissions: {perms}"
+    no-specific-perms: "{role} has no specific {@perms}!"
+    list-perms: "{role} has these {@perms}:\n{perms}"
+    member-perms: "{member} has {@perms} from these roles:\n\n{permissions}"
+    perm-list: Permission list
+    enterPerms: "Please enter valid {@perms}"
+    hasAdminPerm: "{role} has the Administrator permission."
     add:
       name: add
       aliases: ["give"]
-      description: Add permissions to a role
+      description: Add {@perms} to a role
+      added: Permissions Successfully Added
     remove:
       name: remove
-      description: Remove permissions from a role
+      description: Remove {@perms} from a role
+      aliases: ["subtract"]
     clear:
       name: clear
-      description: Remove all permissions from a role
+      description: Remove all {@perms} from a role
+      success: Successfully removed all {@perms} from {role}
     list:
       name: list
-      description: List the permissions of a role / all the permissions
+      description: List the {@perms} of a role or an user / all the {@perms}
   prefix:
     name: prefix
     description: Get/set the bot's prefix

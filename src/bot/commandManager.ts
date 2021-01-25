@@ -21,6 +21,7 @@ import { bot } from "./bot";
  *
  * */
 import schema from "./commands/categories.json";
+import { last } from "lodash";
 
 export interface BaseCommand {
   name: string;
@@ -67,7 +68,7 @@ export interface Arg {
   match?: "everything" | "others";
   optional?: boolean;
   default?: any;
-  otherPositions?: number[];
+  positions?: number[];
   name: string;
 }
 
@@ -130,7 +131,7 @@ export function convertType(
       return arg;
   }
 }
-
+// TODO add support for per-language argument names
 export function parseArgs(
   args: Arg[],
   stringArray: string[],
@@ -141,9 +142,10 @@ export function parseArgs(
 
   const missingArgs: Set<string> = new Set();
   for (const [i, arg] of args.entries()) {
-    if (!argArray[i]) argArray[i] = new Set();
-    argArray[i].add(arg);
-    arg.otherPositions?.forEach((op) => {
+    if (!arg.positions) arg.positions = [i];
+    else if (arg.positions.length < 1) arg.positions.push(i);
+
+    arg.positions?.forEach((op) => {
       if (!argArray[op]) argArray[op] = new Set();
       argArray[op].add(arg);
     });
@@ -163,6 +165,7 @@ export function parseArgs(
   }
   entireLoop: for (const [i, possibleArg] of argArray.entries()) {
     currentArg: for (const arg of possibleArg) {
+      if (result.has(arg.name)) continue;
       if (arg.match === "everything") {
         if (argArray[i + 1]) {
           remainingEverythings.push(arg);
@@ -188,8 +191,7 @@ export function parseArgs(
           break;
         } else if (
           !arg.optional &&
-          (!arg.otherPositions ||
-            arg.otherPositions[arg.otherPositions.length - 1] === i) &&
+          arg.positions[arg.positions.length - 1] === i &&
           remainingEverythings.length < 1
         ) {
           missingArgs.add(arg.name);
@@ -274,11 +276,9 @@ Object.entries(schema).forEach((idk) => {
 
 async function loadCommands(dir: string): Promise<any> {
   const files = await fs.readdir(dir);
-  console.log(Date.now() + "e");
   for await (let file of files) {
     if (file.endsWith(".ts")) {
       const cmds = await import(`${dir}/${file}`);
-      console.log(Date.now());
       for (const v of Object.entries(cmds)) {
         const cmd = <Command>v[1];
         if ("category" in cmd) {
@@ -294,11 +294,39 @@ async function loadCommands(dir: string): Promise<any> {
 export function getCommandUsage(cmd: Command | BaseCommand): string {
   if (!cmd.usage) {
     const usage = [`{@${cmd.name}}`];
-    if (cmd.args)
-      for (const arg of cmd.args) {
-        const t = arg.name || arg.type;
-        usage.push(arg.optional ? `[${t}]` : `<${t}>`);
-      }
+    if (cmd.args) {
+      const doneArgs: Set<string> = new Set();
+      const argsByIndex: Arg[][] = [];
+      cmd.args.forEach((arg, i) => {
+        if (!arg.positions || arg?.positions?.length < 1) arg.positions = [i];
+        arg?.positions?.forEach((pos) => {
+          if (argsByIndex[pos]) argsByIndex[pos].push(arg);
+          else argsByIndex[pos] = [arg];
+        });
+      });
+      argsByIndex.forEach((args, i) => {
+        let argsToAdd: Arg[] = [];
+        args.forEach((arg) => {
+          if (
+            arg.positions.length == 1 ||
+            (argsToAdd.length === 0 && !doneArgs.has(arg.name))
+          ) {
+            argsToAdd.push(arg);
+            doneArgs.add(arg.name);
+          }
+        });
+        if (argsToAdd.length > 0)
+          usage.push(
+            `${
+              argsToAdd.length === 1
+                ? argsToAdd[0].optional
+                  ? `[${argsToAdd[0].name}]`
+                  : `<${argsToAdd[0].name}>`
+                : argsToAdd.map((a) => a.name).join("|")
+            }`
+          );
+      });
+    }
     return usage.join(" ");
   }
   return cmd.usage;
