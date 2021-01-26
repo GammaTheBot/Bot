@@ -2,6 +2,8 @@ import Discord from "discord.js";
 import { readdirSync } from "fs";
 import path from "path";
 import { numberComma } from "../functions";
+import { Utils } from "../Utils";
+import { commands } from "./commandManager";
 const bot = new Discord.Client({
   // Creates a discordjs client
   messageCacheMaxSize: 100, // How many messages per channel should be cached
@@ -26,7 +28,17 @@ bot.on("debug", console.info);
 bot.on("ready", async () => {
   console.log("Bot ready! Starting up modules...");
   console.log("Loading all commands...");
-  await import("./commandManager");
+  const { loadCommands } = await import("./commandManager");
+  console.log(Date.now());
+  await loadCommands(path.join(__dirname, "commands"));
+  console.log(Date.now());
+  console.log(
+    `Loaded ${commands.length} ${Utils.getPlural(
+      commands.length,
+      "command",
+      "commands"
+    )}!`
+  );
   console.log("Loading all events...");
   const eventFiles = readdirSync(path.join(__dirname, "events"));
   eventFiles.forEach(async (file) => {

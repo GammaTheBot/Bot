@@ -13,6 +13,7 @@ import { Lang, Language } from "../language/Language";
 import { UserPermissions } from "../Perms";
 import { Utils } from "../Utils";
 import { bot } from "./bot";
+import path from "path";
 /*
  *
  *
@@ -274,19 +275,19 @@ Object.entries(schema).forEach((idk) => {
   categories.set(idk[0], idk[1]);
 });
 
-async function loadCommands(dir: string): Promise<any> {
+export async function loadCommands(dir: string): Promise<any> {
   const files = await fs.readdir(dir);
   for await (let file of files) {
     if (file.endsWith(".ts")) {
-      const cmds = await import(`${dir}/${file}`);
+      const cmds = await import(path.join(dir, file));
       for (const v of Object.entries(cmds)) {
         const cmd = <Command>v[1];
         if ("category" in cmd) {
           loadCommand(cmd, v[0].toLowerCase());
         }
       }
-    } else if (!file.includes(".")) {
-      await loadCommands(`${dir}/${file}`);
+    } else if (!(file.includes(".") || file.startsWith("-"))) {
+      await loadCommands(path.join(dir, file));
     }
   }
 }
@@ -345,13 +346,3 @@ function loadCommand(cmd: Command, id: string) {
     categories.get(cmd.category).commands = [cmd];
   } else categories.get(cmd.category).commands.push(cmd);
 }
-
-loadCommands(`${__dirname}/commands/`).then(() => {
-  console.log(
-    `Loaded ${commands.length} ${Utils.getPlural(
-      commands.length,
-      "command",
-      "commands"
-    )}!`
-  );
-});
