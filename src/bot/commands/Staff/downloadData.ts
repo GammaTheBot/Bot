@@ -1,6 +1,5 @@
 import { MessageAttachment } from "discord.js";
 import { db } from "../../../database/db";
-import { timeConverter } from "../../../functions";
 import { Language } from "../../../language/Language";
 import { Command } from "../../commandManager";
 

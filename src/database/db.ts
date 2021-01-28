@@ -1,4 +1,4 @@
-import mongoose, { models } from "mongoose";
+import mongoose from "mongoose";
 mongoose.connect(
   `mongodb+srv://Gamma:${process.env.mongo_password}@gamma.gkggs.mongodb.net/Gamma?retryWrites=true&w=majority`,
   {

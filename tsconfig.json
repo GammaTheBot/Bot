@@ -11,10 +11,11 @@
     "outDir": "dist",
     "rootDir": "src",
     "removeComments": true,
-    "strict": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
-    "noImplicitReturns": true,
+    "strictBindCallApply": true,
+    "strictPropertyInitialization": true,
+    "noImplicitThis": true
 
   },
   "include": [

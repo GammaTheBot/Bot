@@ -1,7 +1,6 @@
 import { ArgType, Command } from "../../commandManager";
 
 const Discord = require("discord.js");
-const bot = require("../../bot").bot;
 
 export var Eval: Command = {
   category: "Utility",

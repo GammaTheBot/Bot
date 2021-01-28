@@ -1,7 +1,5 @@
-import { MessageEmbed, Role } from "discord.js";
-import { upperFirst } from "lodash";
+import { Role } from "discord.js";
 import { RoleData } from "../../../../database/schemas/roles";
-import { Guilds } from "../../../../Guilds";
 import { Language } from "../../../../language/Language";
 import { UserPermissions } from "../../../../Perms";
 import { ArgType, BaseCommand } from "../../../commandManager";

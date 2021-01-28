@@ -1,4 +1,4 @@
-import Discord, { DataResolver, Message, TextChannel } from "discord.js";
+import Discord, { Message, TextChannel } from "discord.js";
 import _, { startCase } from "lodash";
 import stringSimilarity from "string-similarity";
 import { GuildData } from "../../database/schemas/guilds";
@@ -17,7 +17,7 @@ import {
 } from "../commandManager";
 import config from "../config.json";
 
-bot.on("messageUpdate", async (oldMessage, newMessage) => {
+bot.on("messageUpdate", async (_, newMessage) => {
   if (commandsRunEdit.length > 0) {
     newMessage = await newMessage.fetch();
     startCommandParsing(newMessage);

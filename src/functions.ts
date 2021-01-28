@@ -1,6 +1,6 @@
 export function numberTh(num: number): string {
   const lastNum = num % 10;
-  let th: string = null;
+  let th: string = "";
   switch (lastNum) {
     case 1:
       th = "st";
@@ -16,7 +16,7 @@ export function numberTh(num: number): string {
   return `${num}${th}`;
 }
 export function timestampToTimespan(timestamp: string): number {
-  if (!timestamp.match(/^(\d{1,2}:?)+$/)) return null;
+  if (!timestamp.match(/^(\d{1,2}:?)+$/)) return 0;
   const times = timestamp.split(":").reverse();
   let timespan = 0;
   if (times[0]) timespan += parseInt(times[0]) * 1000;
@@ -92,8 +92,9 @@ export function timeConverter(UNIX_timestamp: number): string {
   } catch (err) {
     console.error(err);
   }
+  return "";
 }
-export function toMs(timespan: string): number {
+export function toMs(timespan: string): number | null {
   let string = timespan;
   try {
     if (string == null) return null;
@@ -105,9 +106,10 @@ export function toMs(timespan: string): number {
       return null;
     }
     const array = string.match(/\d+[a-z]+/gi);
+    if (!array) return null;
     const le = array.length;
-    let darr = [];
-    let carr = [];
+    let darr: number[] = [];
+    let carr: number[] = [];
     for (let x = 0; x < le; x++) {
       darr.push(parseInt(array[x]));
       let l = array[x].replace(/\d+/gi, "");
@@ -130,8 +132,9 @@ export function toMs(timespan: string): number {
   } catch (e) {
     console.error(e);
   }
+  return null;
 }
-export function toTimespan(number: number, ms?: boolean): string {
+export function toTimespan(number: number, ms?: boolean): string | null {
   try {
     let n: any = {};
     n.centuries = Math.floor(number / 3155760000000);
@@ -167,7 +170,7 @@ export function toTimespan(number: number, ms?: boolean): string {
         return `${numb} ${text}`;
       }
     };
-    let resp = [];
+    let resp: any[] = [];
     for (let key in n) {
       if (newidk(key, n[key])) {
         resp.push(newidk(key, n[key]));
@@ -177,6 +180,7 @@ export function toTimespan(number: number, ms?: boolean): string {
   } catch (error) {
     console.error(error);
   }
+  return null;
 }
 export function filterOutliers(values: number[]): number[] {
   if (values.length < 4) return values;

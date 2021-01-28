@@ -6,14 +6,13 @@ import {
   TextChannel,
 } from "discord.js";
 import { promises as fs } from "fs";
-import fsSync from "fs";
+import path from "path";
 import { ChannelData } from "../database/schemas/channels";
 import { toMs } from "../functions";
 import { Lang, Language } from "../language/Language";
 import { UserPermissions } from "../Perms";
 import { Utils } from "../Utils";
 import { bot } from "./bot";
-import path from "path";
 /*
  *
  *
@@ -22,7 +21,6 @@ import path from "path";
  *
  * */
 import schema from "./commands/categories.json";
-import { last } from "lodash";
 
 export interface BaseCommand {
   name: string;
@@ -105,15 +103,18 @@ export function convertType(
       return toMs(arg);
     }
     case "role": {
+      if (!message.guild) return null;
       return Utils.resolveRole(arg, message.guild.roles.cache, impartial);
     }
     case "user": {
       return Utils.resolveUser(arg, bot.users.cache, impartial);
     }
     case "member": {
+      if (!message.guild) return null;
       return Utils.resolveMember(arg, message.guild.members.cache, impartial);
     }
     case "channel": {
+      if (!message.guild) return null;
       const channel = Utils.resolveChannel(
         arg,
         message.guild.channels.cache,
@@ -184,7 +185,7 @@ export function parseArgs(
           if (missingArgs.has(arg.name)) missingArgs.delete(arg.name);
           if (remainingEverythings.length > 0) {
             const result = convertEverything(
-              remainingEverythings.shift(),
+              remainingEverythings.shift() as Arg,
               stringArray?.slice(0, ind)
             );
             if (result) break currentArg;
@@ -192,7 +193,7 @@ export function parseArgs(
           break;
         } else if (
           !arg.optional &&
-          arg.positions[arg.positions.length - 1] === i &&
+          arg.positions?.[arg.positions.length - 1] === i &&
           remainingEverythings.length < 1
         ) {
           missingArgs.add(arg.name);
@@ -210,7 +211,7 @@ export function parseArgs(
 export async function isCommandDisabled(
   thing: string,
   channel: TextChannel
-): Promise<[boolean, "channel" | "guild"]> {
+): Promise<[boolean, "channel" | "guild" | null]> {
   thing = thing.toLowerCase();
   const doc = await ChannelData.findById(channel.guild.id);
   const disabledGuildCmds = [];
@@ -228,8 +229,8 @@ export async function isCommandDisabled(
 
 export function aliasesToString(
   language: Lang,
-  aliases: string | string[]
-): string[] {
+  aliases: string | string[] | undefined
+): string[] | null {
   if (!aliases) return null;
   if (typeof aliases === "string") {
     const alises = Language.getNode<string | string[]>(language, aliases);
@@ -237,7 +238,7 @@ export function aliasesToString(
   }
   const result = [];
   for (const alias of aliases) {
-    result.push(Language.parseInnerNodes<string | string[]>(language, alias));
+    result.push(Language.parseInnerNodes<string>(language, alias));
   }
   return result;
 }
@@ -246,8 +247,8 @@ export function getCommand(
   str: string,
   language: Lang,
   commands: BaseCommand[]
-): BaseCommand {
-  let command: BaseCommand;
+): BaseCommand | null {
+  let command: BaseCommand | null = null;
   for (const c of commands) {
     const name = Language.getNode(language, c.name);
     const aliases = aliasesToString(language, c.aliases);
@@ -305,11 +306,11 @@ export function getCommandUsage(cmd: Command | BaseCommand): string {
           else argsByIndex[pos] = [arg];
         });
       });
-      argsByIndex.forEach((args, i) => {
+      argsByIndex.forEach((args) => {
         let argsToAdd: Arg[] = [];
         args.forEach((arg) => {
           if (
-            arg.positions.length == 1 ||
+            arg.positions?.length == 1 ||
             (argsToAdd.length === 0 && !doneArgs.has(arg.name))
           ) {
             argsToAdd.push(arg);
@@ -342,7 +343,7 @@ function loadCommand(cmd: Command, id: string) {
     console.error(`Category ${cmd.category} not found!`);
     return;
   }
-  if (!categories.get(cmd.category).commands) {
-    categories.get(cmd.category).commands = [cmd];
-  } else categories.get(cmd.category).commands.push(cmd);
+  if (!categories.get(cmd.category)?.commands) {
+    categories.get(cmd.category)!!.commands = [cmd];
+  } else categories.get(cmd.category)?.commands?.push(cmd);
 }

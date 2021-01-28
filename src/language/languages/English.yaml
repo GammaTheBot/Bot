@@ -97,7 +97,7 @@ command:
     description: Lists and describes the {@commands.commands} the bot offers
     name: "help"
     examples: ["help", "help prefix"]
-    info: My prefix is `{prefix}`. You can also mention the bot as the prefix! For example `{mention} {@commands.help.name}` or `{prefix}{@commands.help.name}`. Execute `{prefix}{@commands.help.name} <{@commands.command}>` to find information on specific {@commands.commands}!
+    info: My prefix is `{prefix}`. You can also mention the bot as the prefix! For example `{mention} {@command.help.name}` or `{prefix}{@command.help.name}`. Execute `{prefix}{@command.help.name} <{@commands.command}>` to find information on specific {@commands.commands}!
   permissions:
     name: permissions
     aliases: ["perms", "perm", "permission"]

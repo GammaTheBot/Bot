@@ -1,17 +1,9 @@
-import {
-  GuildMember,
-  MessageEmbed,
-  PermissionOverwrites,
-  Permissions,
-  Role,
-  User,
-} from "discord.js";
+import { GuildMember, MessageEmbed, Role } from "discord.js";
 import { upperFirst } from "lodash";
 import { RoleData } from "../../../../database/schemas/roles";
 import { Guilds } from "../../../../Guilds";
 import { Language } from "../../../../language/Language";
 import { UserPermissions } from "../../../../Perms";
-import { Utils } from "../../../../Utils";
 import { ArgType, BaseCommand } from "../../../commandManager";
 
 export const ListPermissions: BaseCommand = {

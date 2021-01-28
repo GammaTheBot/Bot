@@ -47,7 +47,7 @@ export const Permission: Command = {
         .setTitle(
           bot.user.username + " " + Language.parseInnerNodes(language, "help")
         );
-      embed.setDescription(await getCmdHelp(Permission, message, language));
+      embed.setDescription(await getCmdHelp(Permission, language));
       message.channel.send(embed);
     }
   },

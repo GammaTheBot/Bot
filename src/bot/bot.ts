@@ -53,7 +53,7 @@ export { bot };
 
 async function updateStatus() {
   const serverCount = bot.guilds.cache.size;
-  bot.user.setPresence({
+  bot.user?.setPresence({
     activity: {
       name: `${numberComma(serverCount)} servers`,
       type: "WATCHING",

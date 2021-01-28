@@ -1,7 +1,6 @@
-import { Message, MessageEmbed, TextChannel } from "discord.js";
+import { MessageEmbed, TextChannel } from "discord.js";
 import _, { upperFirst } from "lodash";
 import stringSimilarity from "string-similarity";
-import { LanguageService } from "typescript";
 import { Guilds } from "../../Guilds";
 import { Lang, Language } from "../../language/Language";
 import { bot } from "../bot";
@@ -140,7 +139,7 @@ export const Help: Command = {
         .setTitle(
           bot.user.username + " " + Language.parseInnerNodes(language, "help")
         );
-      embed.setDescription(await getCmdHelp(cmd, message, language));
+      embed.setDescription(await getCmdHelp(cmd, language));
       message.channel.send(embed);
       return;
     }
@@ -161,7 +160,6 @@ export const Help: Command = {
 
 export async function getCmdHelp(
   cmd: BaseCommand | Command,
-  message: Message,
   lang: Lang
 ): Promise<string> {
   let description = [

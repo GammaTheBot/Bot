@@ -1,6 +1,5 @@
 import { GuildMember } from "discord.js";
 import { RoleData } from "./database/schemas/roles";
-import { Utils } from "./Utils";
 
 export namespace Perms {
   export const noPermEmoji = `⛔`;

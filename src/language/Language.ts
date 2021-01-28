@@ -1,6 +1,6 @@
 import fs from "fs";
+import { isMap, toPath } from "lodash";
 import yaml from "yaml";
-import { toPath, isMap } from "lodash";
 
 export namespace Language {
   export function parseInnerNodes<T>(language: Lang, newNode: any): T {
