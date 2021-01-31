@@ -29,9 +29,7 @@ bot.on("ready", async () => {
   console.log("Bot ready! Starting up modules...");
   console.log("Loading all commands...");
   const { loadCommands } = await import("./commandManager");
-  console.log(Date.now());
   await loadCommands(path.join(__dirname, "commands"));
-  console.log(Date.now());
   console.log(
     `Loaded ${commands.length} ${Utils.getPlural(
       commands.length,

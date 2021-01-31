@@ -110,7 +110,7 @@ export const AddPermission: BaseCommand = {
         },
       });
     } catch (e) {
-      console.log(e);
+      console.error(e);
       return message.channel.send(`:x: ${Language.getNode(language, "error")}`);
     }
   },
