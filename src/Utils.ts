@@ -1,7 +1,8 @@
 import Discord, { MessageEmbed } from "discord.js";
 import stringSimilarity from "string-similarity";
 import { bot } from "./bot/bot";
-
+import { Lang, Language } from "./language/Language";
+import config from "./bot/config.json";
 export namespace Utils {
   export const isBotOwner = async (id: string): Promise<boolean> => {
     const app = await bot.fetchApplication();
@@ -123,4 +124,10 @@ export namespace Utils {
 
     return embed.setAuthor(member.user.tag, member.user.displayAvatarURL());
   };
+
+  export const errorEmbed = (lang: Lang) =>
+    new MessageEmbed()
+      .setTitle(Language.getNode(lang, "error"))
+      .setImage(config.sad)
+      .setColor("PURPLE");
 }
