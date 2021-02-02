@@ -4,14 +4,15 @@ import { Language } from "../../../language/Language";
 import { Utils } from "../../../Utils";
 import { Command } from "../../commandManager";
 
-export const Aww: Command = {
-  name: "command.aww.name",
-  description: "command.aww.description",
+export const Bird: Command = {
+  name: "command.bird.name",
+  description: "command.bird.description",
+  aliases: "command.bird.aliases",
   category: "Animals",
   dms: true,
   exec: async (message, _2, lang) => {
     const msg = await message.channel.send(
-      Language.getNode(lang, "command.aww.finding")
+      Language.getNode(lang, "command.bird.finding")
     );
     const embed = await getAnimal();
     return msg.edit("", {
@@ -26,7 +27,9 @@ export const Aww: Command = {
 };
 
 async function getAnimal(): Promise<MessageEmbed> {
-  const random = await fetch("http://www.reddit.com/r/aww/random.json?limit=1");
+  const random = await fetch(
+    "http://www.reddit.com/r/birb/random.json?limit=1"
+  );
   const json = await random.json();
   const data = json[0].data.children[0].data;
   if (

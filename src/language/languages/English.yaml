@@ -91,11 +91,23 @@ category: category
 examples: examples
 subcommands: subcommands
 aliases: aliases
+thanks: Thanks
+thanks-to: Thanks to {source}
 command:
   aww:
     name: aww
     description: Cute pictures!
     finding: Finding cute pictures...
+  bird:
+    name: bird
+    description: Bird pictures!
+    aliases: ["birb"]
+    finding: Locating the birds...
+  bunny:
+    name: bunny
+    description: "Hop"
+    aliases: ["rabbit", "hoppyboy"]
+    finding: Searching in the bushes...
   eval:
     description: Evaluates code
     name: eval
