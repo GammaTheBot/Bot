@@ -1,4 +1,4 @@
-import Discord from "discord.js";
+import Discord, { MessageEmbed } from "discord.js";
 import stringSimilarity from "string-similarity";
 import { bot } from "./bot/bot";
 
@@ -112,5 +112,15 @@ export namespace Utils {
       if (number & Discord.Permissions.FLAGS[key]) resolved.push(key);
     }
     return resolved;
+  };
+
+  export const setEmbedAuthor = (
+    embed: MessageEmbed,
+    member: Discord.User | Discord.GuildMember
+  ): MessageEmbed => {
+    if (member instanceof Discord.User)
+      return embed.setAuthor(member.tag, member.displayAvatarURL());
+
+    return embed.setAuthor(member.user.tag, member.user.displayAvatarURL());
   };
 }

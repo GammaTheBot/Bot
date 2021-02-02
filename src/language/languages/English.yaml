@@ -58,6 +58,9 @@ categories:
   Staff:
     name: Staff
     description: "Staff {@commands.commands}"
+  Animals:
+    name: Animals
+    description: "Animal {@commands.commands}"
 dms:
   closed-message: "Your direct messages are closed! I can't send you anything!"
 commands:
@@ -89,6 +92,10 @@ examples: examples
 subcommands: subcommands
 aliases: aliases
 command:
+  aww:
+    name: aww
+    description: Cute pictures!
+    finding: Finding cute pictures...
   eval:
     description: Evaluates code
     name: eval

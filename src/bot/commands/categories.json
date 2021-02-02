@@ -6,5 +6,9 @@
 	  "Staff": {
     "description": "{@categories.Staff.description}",
     "name": "🛠️ {@categories.Staff.name}"
+  },
+  "Animals": {
+    "name": "🐶 {@categories.Animals.name}",
+    "description": "{@categories.Animals.description}"
   }
 }
