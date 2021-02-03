@@ -1,5 +1,5 @@
 import { MessageEmbed } from "discord.js";
-import fetch from "node-fetch";
+import axios, { AxiosResponse } from "axios";
 import { Language } from "../../../language/Language";
 import { Utils } from "../../../Utils";
 import { Command } from "../../commandManager";
@@ -13,14 +13,16 @@ export const Aww: Command = {
       Language.getNode(lang, "command.aww.finding")
     );
     async function getAnimal(): Promise<MessageEmbed> | null {
-      const random = await fetch(
-        "http://www.reddit.com/r/aww/random.json?limit=1"
-      );
-      if (!random.status.toString().startsWith(`2`)) {
+      let random: AxiosResponse<any>;
+      try {
+        random = await axios.get(
+          "http://www.reddit.com/r/aww/random.json?limit=1"
+        );
+      } catch (err) {
         msg.edit("", Utils.errorEmbed(lang));
-        return null;
+        return;
       }
-      const json = await random.json();
+      const json = random.data;
       const data = json[0].data.children[0].data;
       if (
         data.is_video ||

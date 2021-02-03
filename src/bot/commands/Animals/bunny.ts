@@ -1,5 +1,5 @@
 import { MessageEmbed } from "discord.js";
-import fetch from "node-fetch";
+import axios from "axios";
 import { Language } from "../../../language/Language";
 import { Utils } from "../../../Utils";
 import { Command } from "../../commandManager";
@@ -27,10 +27,10 @@ export const Bunny: Command = {
 };
 
 async function getAnimal(): Promise<MessageEmbed> {
-  const random = await fetch(
+  const random = await axios.get(
     "https://api.bunnies.io/v2/loop/random/?media=gif,png"
   );
-  const json = await random.json();
+  const json = random.data;
   const embed = new MessageEmbed()
     .setImage(json.media.gif || json.media.poster)
     .setColor("#ffc0cb");

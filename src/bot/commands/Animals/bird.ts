@@ -1,5 +1,5 @@
 import { MessageEmbed } from "discord.js";
-import fetch from "node-fetch";
+import axios from "axios";
 import { Language } from "../../../language/Language";
 import { Utils } from "../../../Utils";
 import { Command } from "../../commandManager";
@@ -27,10 +27,10 @@ export const Bird: Command = {
 };
 
 async function getAnimal(): Promise<MessageEmbed> {
-  const random = await fetch(
+  const random = await axios.get(
     "http://www.reddit.com/r/birb/random.json?limit=1"
   );
-  const json = await random.json();
+  const json = random.data;
   const data = json[0].data.children[0].data;
   if (
     data.is_video ||
