@@ -8,7 +8,7 @@ export const Aww: Command = {
   description: "command.aww.description",
   category: "Animals",
   dms: true,
-  exec: async (message, _2, lang) => {
+  exec: async (message, _, lang) => {
     const msg = await message.channel.send(
       Language.getNode(lang, "command.aww.finding")
     );
@@ -45,7 +45,7 @@ export const Aww: Command = {
         embed: Utils.setEmbedAuthor(embed, message.author).setFooter(
           Language.getNode<string>(lang, "thanks-to").replace(
             /\{source\}/gi,
-            "https://reddit.com"
+            "reddit.com"
           )
         ),
       });

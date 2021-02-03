@@ -79,6 +79,7 @@ noperms:
   bot: "The bot doesn't have enough permissions to do this!"
 added: added
 removed: removed
+image_missing: Image missing? Click here.
 perms: permissions
 current: current
 unexisting: unexisting
@@ -102,12 +103,31 @@ command:
     name: bird
     description: Bird pictures!
     aliases: ["birb"]
-    finding: Locating the birds...
+    finding: Searching in the forest...
   bunny:
     name: bunny
     description: "Hop"
     aliases: ["rabbit", "hoppyboy"]
     finding: Searching in the bushes...
+  cat:
+    name: cat
+    description: "Cute cat pictures"
+    aliases: ["meow"]
+    finding: Searching on the roofs...
+  dog:
+    name: dog
+    description: "Cute dog pictures"
+    aliases: ["woof"]
+    finding: Searching in my lap...
+  duck:
+    name: duck
+    description: "Cute duck pictures"
+    aliases: ["goose", "geese"]
+    finding: Quacking away...
+  fox:
+    name: fox
+    description: "Cute fox pic"
+    finding: Looking for cuties...
   eval:
     description: Evaluates code
     name: eval

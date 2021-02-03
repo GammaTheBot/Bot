@@ -4,36 +4,38 @@ import { Language } from "../../../language/Language";
 import { Utils } from "../../../Utils";
 import { Command } from "../../commandManager";
 
-export const Bunny: Command = {
-  name: "command.bunny.name",
-  description: "command.bunny.description",
-  aliases: "command.bunny.aliases",
+export const Cat: Command = {
+  name: "command.cat.name",
+  description: "command.cat.description",
+  aliases: "command.cat.aliases",
   category: "Animals",
   dms: true,
   exec: async (message, _, lang) => {
     const msg = await message.channel.send(
-      Language.getNode(lang, "command.bunny.finding")
+      Language.getNode(lang, "command.cat.finding")
     );
     let response: AxiosResponse<any>;
     try {
-      response = await axios.get(
-        "https://api.bunnies.io/v2/loop/random/?media=gif,png"
-      );
+      response = await axios.get("https://api.thecatapi.com/v1/images/search", {
+        headers: {
+          "x-api-key": process.env.cat_api_key,
+        },
+      });
     } catch (error) {
       msg.edit("", Utils.errorEmbed(lang));
       return;
     }
     const data = response.data;
     const embed = new MessageEmbed()
-      .setImage(data.media.gif || data.media.poster)
+      .setImage(data.url)
+      .setColor("#ffc0cb")
       .setTitle(Language.getNode(lang, "image_missing"))
-      .setURL(data.media.gif || data.media?.poster)
-      .setColor("#ffc0cb");
+      .setURL(data.url);
     return msg.edit("", {
       embed: Utils.setEmbedAuthor(embed, message.author).setFooter(
         Language.getNode<string>(lang, "thanks-to").replace(
           /\{source\}/gi,
-          "www.bunnies.io"
+          "thecatapi.com"
         )
       ),
     });
