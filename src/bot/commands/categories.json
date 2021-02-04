@@ -10,5 +10,9 @@
   "Animals": {
     "name": "🐶 {@categories.Animals.name}",
     "description": "{@categories.Animals.description}"
+  },
+  "Image": {
+    "name": "📸 {@categories.Image.name}",
+    "description": "{@categories.Image.description}"
   }
 }

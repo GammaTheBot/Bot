@@ -25,6 +25,7 @@
     "@types/mongoose": "^5.10.3",
     "axios": "^0.21.1",
     "bufferutil": "^4.0.2",
+    "canvas": "^2.6.1",
     "cross-env": "^7.0.2",
     "discord.js": "^12.4.1",
     "dotenv": "^8.2.0",
