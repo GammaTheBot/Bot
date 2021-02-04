@@ -25,7 +25,7 @@ export const Dog: Command = {
       msg.edit("", Utils.errorEmbed(lang));
       return;
     }
-    const data = response.data;
+    const data = response.data[0];
     const embed = new MessageEmbed()
       .setImage(data.url)
       .setColor("#ffc0cb")

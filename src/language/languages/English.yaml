@@ -126,8 +126,37 @@ command:
     finding: Quacking away...
   fox:
     name: fox
-    description: "Cute fox pic"
+    description: "Cute fox pictures"
     finding: Looking for cuties...
+  lizard:
+    name: lizard
+    description: "Cute lizard pictures"
+    finding: Looking for lizards...
+  panda:
+    name: panda
+    description: "Cute panda pictures"
+    finding: Looking through the bamboos...
+  koala:
+    name: koala
+    description: "Cute koala pictures"
+    finding: Looking in the trees...
+  snake:
+    name: snake
+    description: "Cute snake pictures"
+    finding: Entering the forest...
+    aliases: ["snek"]
+  catfact:
+    name: catfact
+    finding: Looking for facts...
+    description: Cat facts
+    fact: Cat fact
+    aliases: ["catfacts"]
+  dogfact:
+    fact: Dog fact
+    name: dogfact
+    finding: Looking for facts...
+    description: Dog facts
+    aliases: ["dogfacts"]
   eval:
     description: Evaluates code
     name: eval
