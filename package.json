@@ -30,7 +30,7 @@
     "discord.js": "^12.4.1",
     "dotenv": "^8.2.0",
     "erlpack": "discord/erlpack",
-    "jsdom": "^16.4.0",
+    "jsdom": "^16.5.0",
     "libsodium-wrappers": "^0.7.8",
     "lodash": "^4.17.20",
     "mathjs": "^8.0.1",
